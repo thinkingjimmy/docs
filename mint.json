@@ -15,56 +15,153 @@
       "to": "#07C983"
     }
   },
+  "theme": "prism",
+  "tabs":[
+    {
+      "name": "Changelog",
+      "url": "changelogs"
+    }
+  ],
+  "primaryTab": {
+    "name": "Home"
+  },
   "anchors": [
+    {
+      "name": "Discord",
+      "icon": "discord",
+      "url": "https://discord.gg/flux"
+    },
     {
       "name": "ComfyUI 101",
       "icon": "book-open-cover",
       "url": "https://www.comflowy.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "discord",
-      "url": "https://mintlify.com/community"
     }
   ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Welcome",
+      "version": "English",
       "pages": [
-        "introduction",
-        "quickstart",
-        "development"
+        "introduction"
       ]
     },
     {
-      "group": "Essentials",
+      "group": "ようこそ",
+      "version": "Japanese",
       "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
+        "introduction-jp"
       ]
     },
     {
-      "group": "API Documentation",
+      "group": "欢迎",
+      "version": "Chinese",
       "pages": [
-        "api-reference/introduction"
+        "introduction-cn"
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Basics",
+      "version": "English",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "basics/flux-model"
+      ]
+    },
+    {
+      "group": "ようこそ",
+      "version": "Japanese",
+      "pages": [
+        "basics/flux-model-jp"
+      ]
+    },
+    {
+      "group": "基础",
+      "version": "Chinese",
+      "pages": [
+        "basics/flux-model-cn"
+      ]
+    },
+    {
+      "group": "Changelog",
+      "version": "English",
+      "pages": [
+        "changelogs/updates"
+      ]
+    },
+    {
+      "group": "更新日志",
+      "version": "Japanese",
+      "pages": [
+        "changelogs/updates-jp"
+      ]
+    },
+    {
+      "group": "更新日志",
+      "version": "Chinese",
+      "pages": [
+        "changelogs/updates-cn"
       ]
     }
   ],
-  "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://linkedin.com/company/mintlify"
+  "topbarCtaButton": {
+    "name": "Try Flux",
+    "url": "https://flux.com"
+  },
+  "versions": [
+    {
+      "name": "English",
+      "locale": "en",
+      "default": true
+    },
+    {
+      "name": "Japanese",
+      "locale": "jp"
+    },
+    {
+      "name": "Chinese",
+      "locale": "cn"
+    }
+  ],
+  "footer": {
+    "socials": {
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
+    },
+    "links": [
+      {
+        "title": "Resources",
+        "links": [
+          {
+            "label": "Comflowy",
+            "url": "https://app.comflowy.com/"
+          },
+          {
+            "label": "ComfyUI 101",
+            "url": "https://www.comflowy.com/docs"
+          }
+        ]
+      },
+      {
+        "title": "Flux Apps",
+        "links": [
+          {
+            "label": "Careers",
+            "url": "https://mintlify.com/careers"
+          },
+          {
+            "label": "Blog",
+            "url": "https://mintlify.com/blog"
+          },
+          {
+            "label": "Public Roadmap",
+            "url": "https://feedback.mintlify.com/roadmap"
+          },
+          {
+            "label": "Security",
+            "url": "https://mintlify.com/security/responsible-disclosure"
+          }
+        ]
+      }
+    ]
   }
 }
