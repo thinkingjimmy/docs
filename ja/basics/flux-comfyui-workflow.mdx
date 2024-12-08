@@ -73,8 +73,6 @@ ComfyUI で Flux を使用する方法は以下の4つです。
 
 まず、ComfyUI が推奨するフルバージョンのワークフローを紹介します。以下のスクリーンショットを参照してノードを接続し、手動で接続することでフルワークフローを理解できます。
 
-また、[Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) で直接ワークフローを使用するか、このワークフローテンプレートをダウンロードしてインポートします。（また、Comflowy テンプレートの使用方法がわからない場合は、この [チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template) を読んでください）。
-
 <Frame>
   <img
     className="rounded-xl"
@@ -82,6 +80,17 @@ ComfyUI で Flux を使用する方法は以下の4つです。
     alt="ComfyUI Flux Full Workflow"
   />
 </Frame>
+
+手動で接続したくない場合は、[Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) に移動して、8秒で1枚の画像を生成できる Flux Dev アプリケーションを使用できます。または、このワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートしてください。（Comflowy テンプレートのダウンロード方法がわからない場合は、こちらの[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)をお読みください）。
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev アプリ" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    このアプリケーションを使用すると、1枚の画像生成が8秒で完了します。
+  </Card>
+  <Card title="Flux ComfyUI テンプレート" icon="cloud-arrow-down" href="https://app.comflowy.com/app/b869601d-8f26-4638-aef0-ef38169f5ca5" horizontal>
+    右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+  </Card>
+</CardGroup>
 
 このワークフローを簡単に紹介します。このワークフローは ComfyUI のデフォルトの Stable Diffusion ワークフローとは非常に異なります。詳しく説明します。
 
@@ -132,7 +141,17 @@ ComfyUI で Flux を使用する方法は以下の4つです。
 
 #### 1.4.2 私がお勧めするバージョン
 
-私は ComfyUI の公式バージョンが少し複雑であると感じているため、より簡単なバージョンをお勧めします。このバージョンでは、Stable Diffusion で一般的に使用される KSampler ノードのみを使用し、ModelSamplingFlux ノードを削除します。そのため、SD3LatentImage で幅と高さを設定するだけで済みます。一般的に、このバージョンはより簡単で理解しやすいです。
+私は ComfyUI の公式バージョンが少し複雑であると感じているため、より簡単なバージョンをお勧めします。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+このバージョンでは、Stable Diffusion で一般的に使用される KSampler ノードのみを使用し、ModelSamplingFlux ノードを削除します。そのため、SD3LatentImage で幅と高さを設定するだけで済みます。一般的に、このバージョンはより簡単で理解しやすいです。
 
 また、以下に注意してください：
 
@@ -155,13 +174,16 @@ ComfyUI で Flux を使用する方法は以下の4つです。
   </tbody>
 </table>
 
-<Frame>
-  <img
-    className="rounded-xl"
-    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
-    alt="ComfyUI Flux FP8 Workflow"
-  />
-</Frame>
+手動で接続したくない場合は、[Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) に移動して、8秒で1枚の画像を生成できる Flux Dev アプリケーションを使用できます。または、このワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートしてください。（Comflowy テンプレートのダウンロード方法がわからない場合は、こちらの[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)をお読みください）。
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev アプリ" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    このアプリケーションを使用すると、1枚の画像生成が8秒で完了します。
+  </Card>
+  <Card title="Flux ComfyUI テンプレート" icon="cloud-arrow-down" href="https://app.comflowy.com/app/8ba9deba-7dc3-4adf-85e1-0a0df0b0c4cd" horizontal>
+    右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+  </Card>
+</CardGroup>
 
 
 ## 2. FP8版のFlux
@@ -172,9 +194,7 @@ ComfyUI で Flux を使用する方法は以下の4つです。
 
 ### 2.2 ComfyUIワークフローの設定
 
-以下のスクリーンショットを参照してノードを接続するか、[Comflowy](https://app.comflowy.com/app/s-flux-dev-fp8-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
-
-このバージョンは、前にお勧めしたバージョンよりもさらに簡単なバージョンです。Diffusion Model、DualCLIPLoader、および VAE ノードを Checkpoint Loader ノードに置き換えます。
+以下のスクリーンショットを参照して、ノードを手動で接続します。このバージョンは、上でお勧めしたバージョンよりも簡略化されたバージョンです。Diffusion Model、DualCLIPLoader、および VAE ノードを Checkpoint Loader ノードに置き換えます。
 
 <Frame>
   <img
@@ -217,6 +237,17 @@ ComfyUI で Flux を使用する方法は以下の4つです。
   </tbody>
 </table>
 
+手動で接続したくない場合は、[Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) に移動して、8秒で1枚の画像を生成できる Flux Dev アプリケーションを使用できます。または、このワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートしてください。（Comflowy テンプレートのダウンロード方法がわからない場合は、こちらの[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)をお読みください）。
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev アプリ" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    このアプリケーションを使用すると、1枚の画像生成が8秒で完了します。
+  </Card>
+  <Card title="Flux ComfyUI テンプレート" icon="cloud-arrow-down" href="https://app.comflowy.com/app/b869601d-8f26-4638-aef0-ef38169f5ca5" horizontal>
+    右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+  </Card>
+</CardGroup>
+
 ## 3. GGUF版のFlux
 
 ### 3.1 GGUF版のFluxモデルをダウンロード
@@ -252,7 +283,16 @@ ComfyUI で Flux を使用する方法は以下の4つです。
 
 まず、[ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) プラグインをインストールする必要があります。ここではインストール方法を繰り返しません。[ComfyUI プラグインのインストール方法](https://www.comflowy.com/advanced/how-to-install-comfyui-extension)を参照してください。
 
-プラグインをインストールした後、以下のスクリーンショットを参照してノードを接続するか、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+プラグインをインストールした後、以下のスクリーンショットを参照してノードを手動で接続します。手動で接続したくない場合は、[Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) に移動して、8秒で1枚の画像を生成できる Flux Dev アプリケーションを使用できます。または、このワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートしてください。（Comflowy テンプレートのダウンロード方法がわからない場合は、こちらの[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)をお読みください）。
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    このアプリケーションを使用すると、1枚の画像生成が8秒で完了します。
+  </Card>
+  <Card title="Flux ComfyUI テンプレート" icon="cloud-arrow-down" href="https://app.comflowy.com/app/30a0f1e6-d42a-4fb4-bf99-ace676c14e4c" horizontal>
+    右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+  </Card>
+</CardGroup>
 
 このワークフローをよく見ると、FP8バージョンのワークフローと非常に似ています。唯一の違いは、Checkpoint Loader ノードを GGUF Loader ノードに置き換えたことです（図の①）。GGUF モデルには Text Encoder モデルと VAE モデルが含まれていないため、別の DualCLIPLoader ノード（図の②）と VAE ノード（図の③）を使用する必要があります：
 

@@ -1,7 +1,8 @@
 ---
 title: Flux ComfyUI 工作流
-description: ''
+description: '本章节将介绍如何在 ComfyUI 中使用 Flux 模型。'
 icon: 'object-group'
+og:image: '/images/basics/flux-comfyui-workflow/lettermark-of-flux-with-leaf-light.png'
 ---
 
 <Frame caption="此图片由 AI 生成">
@@ -73,8 +74,6 @@ icon: 'object-group'
 
 首先介绍下 ComfyUI 官方推荐的 Flux 的完整版本工作流，你可以参考以下截图自行连接节点，手动连接将有助于你理解完整的工作流。
 
-亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的工作流，亦或者下载此工作流模板，并导入使用。（另外，如果你不知道如何使用 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
-
 <Frame>
   <img
     className="rounded-xl"
@@ -82,6 +81,17 @@ icon: 'object-group'
     alt="ComfyUI Flux Full Workflow"
   />
 </Frame>
+
+如果你不想手动连接，可以去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的 Flux Dev 应用，使用此应用，生成单张图片只需要 8s 左右。亦或者下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    使用此应用，生成单张图片只需要 8s 左右。
+  </Card>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/b869601d-8f26-4638-aef0-ef38169f5ca5" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 我来简单介绍下这个工作流。你可以看到这个工作流与 ComfyUI 的默认 Stable Diffusion 工作流有很大的差异。我来详细解释下：
 
@@ -133,7 +143,17 @@ icon: 'object-group'
 
 #### 1.4.2 我推荐的版本
 
-ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本。这个版本仅需要使用到 Stable Diffusion 里常用的 KSampler 节点，去掉了 ModelSamplingFlux 节点，这样仅需要在 SD3LatentImage 里设置宽高。整体来看，这个版本更简单，也更容易理解。
+ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+这个版本仅需要使用到 Stable Diffusion 里常用的 KSampler 节点，去掉了 ModelSamplingFlux 节点，这样仅需要在 SD3LatentImage 里设置宽高。整体来看，这个版本更简单，也更容易理解。
 
 另外需要注意：
 
@@ -156,14 +176,16 @@ ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本
   </tbody>
 </table>
 
-<Frame>
-  <img
-    className="rounded-xl"
-    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
-    alt="ComfyUI Flux FP8 Workflow"
-  />
-</Frame>
+如果你不想手动连接，可以去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的 Flux Dev 应用，使用此应用，生成单张图片只需要 8s 左右。亦或者下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
 
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    使用此应用，生成单张图片只需要 8s 左右。
+  </Card>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/8ba9deba-7dc3-4adf-85e1-0a0df0b0c4cd" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 ## 2. FP8 版本 Flux
 
@@ -173,9 +195,7 @@ ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本
 
 ### 2.2 配置 ComfyUI 工作流
 
-使用 FP8 版本 Flux 的工作流，可以参考以下截图自行连接节点，亦或者去到 [Comflowy]() 下载此工作流，并导入使用。
-
-这个版本，其实是我上面推荐的版本的更加简化的版本，将 Diffusion Model、DualCLIPLoader 和 VAE 节点替换为 Checkpoint Loader 节点。
+使用 FP8 版本 Flux 的工作流，可以参考以下截图自行连接节点。这个版本，其实是我上面推荐的版本的更加简化的版本，将 Diffusion Model、DualCLIPLoader 和 VAE 节点替换为 Checkpoint Loader 节点：
 
 <Frame>
   <img
@@ -186,7 +206,6 @@ ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本
 </Frame>
 
 这个版本的工作流，与 Stable Diffusion 的工作流基本一致。有几个变化需要注意：
-
 
 <table>
   <thead>
@@ -218,6 +237,17 @@ ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本
     </tr>
   </tbody>
 </table>
+
+如果你不想手动连接，可以去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的 Flux Dev 应用，使用此应用，生成单张图片只需要 8s 左右。亦或者下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    使用此应用，生成单张图片只需要 8s 左右。
+  </Card>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/b869601d-8f26-4638-aef0-ef38169f5ca5" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 ## 3. GGUF 版本 Flux
 
@@ -254,7 +284,16 @@ ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本
 
 首先，你需要安装 [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) 插件，安装方法我这里不再赘述，你可以参考 [ComfyUI 插件安装教程](https://www.comflowy.com/advanced/how-to-install-comfyui-extension)。
 
-安装好插件后，你可以根据以下截图，自行连接节点。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+安装好插件后，你可以根据以下截图，自行连接节点。如果你不想手动连接，可以去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的 Flux Dev 应用，使用此应用，生成单张图片只需要 8s 左右。亦或者下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    使用此应用，生成单张图片只需要 8s 左右。
+  </Card>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/30a0f1e6-d42a-4fb4-bf99-ace676c14e4c" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 如果你细看这个工作流，你会发现它与 FP8 版本的工作流，非常像，只是将 Checkpoint Loader 节点，替换为 GGUF Loader 节点（图中①）。同时因为 GGUF 模型没有包含 Text Encoder 和 VAE 模型，所以需要用另外的 DualCLIPLoader （图中②）节点和 VAE 节点（图中③）：
 

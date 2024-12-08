@@ -73,8 +73,6 @@ After downloading the model, you can start building the workflow.
 
 First, let's introduce the full version workflow of Flux recommended by ComfyUI. You can refer to the following screenshot to connect the nodes yourself, manually connecting will help you understand the full workflow. 
 
-Or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) to use our workflow directly, or download this workflow template and import it. (Also, if you don't know how to use Comflowy templates, you can read this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)).
-
 <Frame>
   <img
     className="rounded-xl"
@@ -82,6 +80,17 @@ Or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) to 
     alt="ComfyUI Flux Full Workflow"
   />
 </Frame>
+
+If you don't want to manually connect, you can go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) to use our Flux Dev application, which can generate a single image in just 8s. Or download this workflow template and import it into your local ComfyUI. (Also, if you don't know how to download Comflowy templates, you can read this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)).
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    Use this application, generating a single image only takes 8s.
+  </Card>
+  <Card title="Flux ComfyUI Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/b869601d-8f26-4638-aef0-ef38169f5ca5" horizontal>
+    Click the Remix button in the upper right corner to enter the workflow mode.
+  </Card>
+</CardGroup>
 
 Let me introduce this workflow briefly. You can see that this workflow is very different from the default Stable Diffusion workflow of ComfyUI. Let me explain it in detail:
 
@@ -133,7 +142,17 @@ Let me introduce this workflow briefly. You can see that this workflow is very d
 
 #### 1.4.2 My recommended version
 
-I think the official version of ComfyUI is a bit too complex, so I recommend a simplified version. This version only needs to use the KSampler node commonly used in Stable Diffusion, and removes the ModelSamplingFlux node. So you only need to set the width and height in SD3LatentImage. In general, this version is simpler and easier to understand.
+I think the official version of ComfyUI is a bit too complex, so I recommend a simplified version. 
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+This version only needs to use the KSampler node commonly used in Stable Diffusion, and removes the ModelSamplingFlux node. So you only need to set the width and height in SD3LatentImage. In general, this version is simpler and easier to understand.
 
 Also, pay attention to:
 
@@ -156,13 +175,17 @@ Also, pay attention to:
   </tbody>
 </table>
 
-<Frame>
-  <img
-    className="rounded-xl"
-    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
-    alt="ComfyUI Flux FP8 Workflow"
-  />
-</Frame>
+
+If you don't want to manually connect, you can go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) to use our Flux Dev application, which can generate a single image in just 8s. Or download this workflow template and import it into your local ComfyUI. (Also, if you don't know how to download Comflowy templates, you can read this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)).
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    Use this application, generating a single image only takes 8s.
+  </Card>
+  <Card title="Flux ComfyUI Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/8ba9deba-7dc3-4adf-85e1-0a0df0b0c4cd" horizontal>
+    Click the Remix button in the upper right corner to enter the workflow mode.
+  </Card>
+</CardGroup>
 
 
 ## 2. FP8 version of Flux
@@ -173,9 +196,7 @@ You can click [here](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-
 
 ### 2.2 Configure ComfyUI workflow
 
-You can refer to the following screenshot to connect the nodes yourself, or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-fp8-workflow-db9bd4) to download this workflow and import it.
-
-This version is actually a more simplified version of the version I recommended above, replacing the Diffusion Model, DualCLIPLoader, and VAE nodes with the Checkpoint Loader node.
+You can refer to the following screenshot to connect the nodes yourself. This version is actually a more simplified version of the version I recommended above, replacing the Diffusion Model, DualCLIPLoader, and VAE nodes with the Checkpoint Loader node.
 
 <Frame>
   <img
@@ -218,6 +239,17 @@ This workflow is basically the same as the Stable Diffusion workflow. There are 
   </tbody>
 </table>
 
+If you don't want to manually connect, you can go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) to use our Flux Dev application, which can generate a single image in just 8s. Or download this workflow template and import it into your local ComfyUI. (Also, if you don't know how to download Comflowy templates, you can read this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)).
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    Use this application, generating a single image only takes 8s.
+  </Card>
+  <Card title="Flux ComfyUI Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/b869601d-8f26-4638-aef0-ef38169f5ca5" horizontal>
+    Click the Remix button in the upper right corner to enter the workflow mode.
+  </Card>
+</CardGroup>
+
 ## 3. GGUF version Flux
 
 ### 3.1 Download GGUF version Flux model
@@ -253,7 +285,16 @@ You will see that there are many versions of GGUF, you can choose the one that s
 
 First, you need to install the [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) plugin. I won't repeat the installation method here. You can refer to [ComfyUI Extension Installation Tutorial](https://www.comflowy.com/advanced/how-to-install-comfyui-extension).
 
-After installing the plugin, you can connect the nodes yourself according to the following screenshot, or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) to download this workflow and import it.
+After installing the extension, you can connect the nodes yourself according to the following screenshot.If you don't want to manually connect, you can go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) to use our Flux Dev application, which can generate a single image in just 8s. Or download this workflow template and import it into your local ComfyUI. (Also, if you don't know how to download Comflowy templates, you can read this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)).
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    Use this application, generating a single image only takes 8s.
+  </Card>
+  <Card title="Flux ComfyUI Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/30a0f1e6-d42a-4fb4-bf99-ace676c14e4c" horizontal>
+    Click the Remix button in the upper right corner to enter the workflow mode.
+  </Card>
+</CardGroup>
 
 If you look at this workflow closely, you will find that it is very similar to the FP8 version workflow, only replacing the Checkpoint Loader node with the GGUF Loader node (① in the figure). Because the GGUF model does not contain the Text Encoder and VAE models, so you need to use another DualCLIPLoader (② in the figure) node and VAE node (③ in the figure):
 

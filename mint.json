@@ -298,5 +298,15 @@
         ]
       }
     ]
+  },
+  "metadata": {
+    "og:site_name": "Flux 101",
+    "og:url": "https://flux101.com",
+    "og:image": "/images/introduction/hero-light.png",
+    "twitter:url": "https://twitter.com/hellojimmywong",
+    "twitter:site": "@hellojimmywong",
+    "twitter:image": "/images/introduction/hero-light.png",
+    "twitter:creator": "@hellojimmywong",
+    "twitter:description": "Flux 101 is a comprehensive guide to using Flux, a cutting-edge image generation model. It covers everything from basic usage to advanced techniques, and includes a detailed explanation of how to use Flux with ComfyUI."
   }
 }
