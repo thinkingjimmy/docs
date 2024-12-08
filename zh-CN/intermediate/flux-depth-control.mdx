@@ -1,0 +1,146 @@
+---
+title: Flux 深度控制
+description: '在本章中，我们将介绍如何使用 Flux 深度控制来生成与原图内容位置深度一致的图片。'
+icon: 'screwdriver-wrench'
+---
+
+<Frame caption="此图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-header-image.png"
+    alt="Flux Depth Control Header Image"
+  />
+</Frame>
+
+除了使用边缘作为控制参考外，还有一种叫深度图（Depth）的控制方式。这种控制方式，可以给模型提供一些位置深度信息，从而生成与原图内容位置深度一致的图片。
+
+比如像下图所示，我将一张图片输入给 Flux 模型，然后让 Flux 模型生成一张与原图内容位置一致的图片。你可以看到，生成出来的图片，除了表情有点变化外（主要是因为我的 Prompt 没写好），整体人物的位置关系，以及人物的姿势都和原图几乎是一致的。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-compare.png"
+    alt="Flux Depth Control"
+  />
+</Frame>
+
+## 1. 下载 Flux Depth 模型
+
+与 Canny 类似，目前有两种 Flux Depth 模型，一种是 Flux 官方实现的 Flux Depth LoRA，另一种则是由开源社区里的其他机构实现的 Flux Depth Controlnet。前者基于 Control LoRA 技术实现，后者则是基于 ControlNet 技术实现。
+
+各位可以都下载下来尝试一下：
+
+* Flux 官方提供了两种 Depth LoRA 模型文件，你可以根据自己需求选择：
+  - 一个是将 Flux Depth LoRA 和 Flux Dev 打包在一起的模型。你可以在[这里](https://huggingface.co/black-forest-labs/FLUX.1-Depth-dev/tree/main)下载到此模型，然后将其放在 `/models/diffusion_models/` 文件夹里。但这个模型因为包含了 Flux Dev 模型，所以体积较大，有 24GB 左右。但好处是加载模型的时候只需要加载一个。
+  - 如果你不想下载那么大的模型，可以在[这里](https://huggingface.co/black-forest-labs/FLUX.1-Depth-dev-lora/tree/main)下载到单独的 Flux Depth LoRA 模型，并将其放在 `models/loras/` 文件夹里。这个模型文件只有 1.24GB 左右。
+* 目前有两个开源机构实现了 Flux Depth Controlnet 模型，你可以根据自己需求选择：
+  - 第一个是 Shakker-Labs 和 InstantX 合作开源的 [Depth  ControlNet模型](https://huggingface.co/Shakker-Labs/FLUX.1-dev-ControlNet-Depth/blob/main/diffusion_pytorch_model.safetensors),你需要将这个模型下载并放到 `models/controlnet/` 文件夹里。另外，注意这个文件在下载的时候可以改下名字，改成 `instantx_flux_depth.safetensors`，方便后续使用。
+  - 另一个是 XLabs 开源的 [Flux Depth controlnet v2](https://huggingface.co/XLabs-AI/flux-controlnet-collections/tree/main) 模型，你也需要将这个模型下载并放到 `models/controlnet/` 文件夹里。
+
+## 2. Flux Depth LoRA 工作流
+
+如果你下载的是 LoRA 加 Dev 模型合一的版本，那么你只需要基于上一章[Flux 边缘控制](./flux-canny-control)里的工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+修改的方法很简单，你只需要将图中 ① Diffusion 节点组里的 flux Canny 换成 Depth 模型 ，然后再将 `Canny` 节点替换为任意的 `Depth` 节点（图中②）即可（Depth 节点你可以用任何你习惯的 Depth 节点都可以）。最后将 `Depth` 节点和 `Load Image` 节点相连。如果你想要预览 Depth 节点的效果，你可以将 `Depth` 节点和 `Preview Image` 节点相连，这样你就能看到 Depth 节点输出的深度图了。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-workflow.png"
+    alt="Flux Depth Control"
+  />
+</Frame>
+
+如果你下载的是单独的 Flux Depth LoRA 模型，那么你只需在 `Load Diffusion Model` 节点（图中①）后面，添加一个 `LoraLoaderModelOnly` 节点（图中②）。然后将 Diffusion 节点组里的 `flux dev depth` 模型换成 `flux dev` ，然后在 `LoraLoaderModelOnly` 节点里选择你下载的 Flux Depth LoRA 模型即可。
+
+两者的效果基本上不会有太大的区别。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-lora-workflow.png"
+    alt="Flux Depth Control"
+  />
+</Frame>
+
+## 3. Flux Depth Controlnet 工作流
+
+### 3.1 InstantX 版本
+首先，因为要额外运行 ControlNet 模型，会占用额外的显存，所以我推荐你加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中的 GGUF 版本 Flux 工作流，然后基于此工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+这个版本，你需要：
+
+1. 添加图中①所示的 `Apply ControlNet with VAE` 节点。然后将其与 `Load VAE` 、`Load ControlNet Model`（图中②） 以及任意的 `Depth` 节点（图中③）相连。
+2. `Load ControlNet Model` 节点选择下载好的 Flux Depth Controlnet 模型。
+3. 为了让生成的图与输入的 Depth 图大小一致，我还添加了一个 `Get Image Size` 节点（图中④），然后将其与 `SD3LatentImage` 节点（图中⑤）相连。这样生成的图片大小就与输入的 Depth 图大小一致了。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-shakker-workflow.jpeg"
+    alt="Flux Depth Control"
+  />
+</Frame>
+
+另外，如果你不想使用 GGUF 版本，也可以使用 ComfyUI 官方提供的 FP8 版本，仅需要去掉 `Load VAE` 和 `DualCLIPLoader` 节点即可，并替换成 `Load Checkpoint` 节点。然后选择 FP8 版本的 Flux 模型即可。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-fp8-workflow.jpeg"
+    alt="Flux Depth Control"
+  />
+</Frame>
+
+坦率说来，我个人会更喜欢 Flux 官方的 Depth LoRA 模型，它的效果会更好一些。
+
+### 3.2 XLabs 版本
+
+使用 XLabs 版本的 Flux Depth Controlnet 模型，需要使用到 XLabs 开发的插件。这是他们的 Github [插件地址](https://github.com/XLabs-AI/x-flux-comfyui)。你可以通过 ComfyUI 的 ComfyUI-Manager 安装此插件。详细的安装方式，可以参考[安装 ComfyUI 插件](https://comflowy.com/advanced/how-to-install-comfyui-extension)一文。
+
+安装完后，你可以通过修改 Shakker-Labs 版本的工作流。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+修改起来不算太难：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">图示</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>将 KSampler 换成 Xlabs Sampler 节点。你可以看到这个节点多了个 `controlnet_condition` 的输入。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>我将 `CLIPTextEncode` 节点替换为 `CLIPTextEncodeFlux` 节点。你可以不用修改。我只想告诉各位还有其他 Flux 的 CLIP 节点。这个节点可以分别对 Clip l 和 t5xxl 进行控制。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>将 `Apply ControlNet VAE` 节点换成 `Apply Flux ControlNet` 节点。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>将 `Load ControlNet Model` 节点换成 `Load Flux ControlNet` 节点。并选择下载好的 Flux Depth Controlnet 模型。</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>我这换了一个 `Depth` 节点。你可以用任意你习惯的 Depth 节点。</td>
+    </tr>
+    <tr>
+      <td>⑥</td>
+      <td>`SD3LatentImage` 节点我也用了 `Empty Latent Image` 节点。也是为了展示这个节点除了 SD3 的版本外，也可以用最普通的那个。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-xlabs-workflow.jpeg"
+    alt="Flux Depth Control"
+  />
+</Frame>

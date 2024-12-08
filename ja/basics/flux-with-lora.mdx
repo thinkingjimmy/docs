@@ -1,0 +1,83 @@
+---
+title: Flux LoRA
+description: 'Flux LoRA の使用方法を紹介します。'
+icon: 'palette'
+---
+
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-header-image.png"
+    alt="Flux LoRA Header Image"
+  />
+</Frame>
+
+## 1. Flux LoRA モデルのダウンロード
+
+Flux LoRA モデルは多く、ほとんどが Hugging Face で共有されています。Hugging Face の検索機能を通じて見つけることができます。
+
+しかし、Hugging Face の検索機能はあまり良くありません。以下の方法で検索してフィルタリングすることができます：
+
+1. 上部の `Models` ボタンをクリックします。
+2. 左側の `Text to Image` をクリックします。
+3. 右側の検索ボックスに `flux lora` と入力します。これにより、すべての Flux LoRA モデルが表示されます。
+4. 最後に、右側の `Sort` ボタンをクリックして、`Most Downloads` などの並べ替え方法を切り替えることができます。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-search.jpeg"
+    alt="Flux LoRA Search"
+  />
+</Frame>
+
+お気に入りの Flux LoRA モデルを選択し、それに入り、`Files and versions` ボタン（図の①）をクリックして、LoRA ファイル（図の②）をダウンロードします。そして、ファイルを `/models/loras` ディレクトリに配置します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-files.png"
+    alt="Flux LoRA Files"
+  />
+</Frame>
+
+## 2. Flux LoRA Workflow
+
+モデルをダウンロードしたら、Flux LoRA ComfyUI ワークフローを構築しましょう。まず、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow) で紹介したフル Flux ワークフローをロードし、それをベースに変更します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードして使用します。
+
+変更は比較的少なく、`LoraLoaderModelOnly` ノード（図の①）を追加するだけです。これは `LoraLoaderModelOnly` であり、`LoraLoader` ではないことに注意してください。なぜなら、LoRA モデルをロードするだけで、Clip モデルをロードする必要はないからです。
+
+そして、ダウンロードした Flux LoRA モデルを選択し、画像生成時の LoRA モデルの強度を調整するために `strength_model` パラメータを設定します（図の②）。値が高いほど影響が大きくなります。プロンプトに LoRA に関連するパラメータを追加する必要はありません。これを行うことはほとんど効果がありません。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-single-lora-workflow.jpeg"
+    alt="Flux Single LoRA Workflow"
+  />
+</Frame>
+
+
+## 3. 複数の LoRA モデルをチェーン
+
+LoRA モデルをチェーンするだけでなく、複数の LoRA モデルをチェーンすることもできます。これにより、2 つの LoRA モデルが重なり合って画像生成に影響を与え、より期待通りの画像が生成されます。
+
+複数の `LoraLoaderModelOnly` ノードを追加し、ダウンロードした Flux LoRA モデルを選択します。例えば、以下のワークフローでは、2 つの Flux LoRA モデルを追加しました。1 つは Flux-Super-Realism-LoRA、もう 1 つは Flux-Midjourney-Mix2-LoRA です。前者は生成された画像をよりリアルにし、後者は生成された画像を Midjourney に近づけます。画像はより精巧になり、視覚的なスタイルも向上します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-multiple-lora-workflow.jpeg"
+    alt="Flux Multiple LoRA Workflow"
+  />
+</Frame>
+
+もう 1 つの小さなトリックは、`LoraLoaderModelOnly` ノードを右クリックして `Bypass` を選択することで、LoRA モデルをバイパスできることです。LoRA モデルが不要な場合、これを行うことははるかに便利です。ノードを削除して再接続する必要はありません：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-bypass.png"
+    alt="Flux LoRA Bypass"
+  />
+</Frame>

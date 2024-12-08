@@ -2,10 +2,10 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "Flux 101",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/images/logo/dark.svg",
+    "light": "/images/logo/light.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/images/favicon.svg",
   "colors": {
     "primary": "#0D9373",
     "light": "#07C983",
@@ -18,8 +18,34 @@
   "theme": "prism",
   "tabs":[
     {
+      "name": "Flux Prompt Library",
+      "version": "English",
+      "url": "en/prompt-library"
+    },
+    {
+      "name": "Flux 提示词库",
+      "version": "日本語",
+      "url": "ja/prompt-library"
+    },
+    {
+      "name": "Flux 提示词库",
+      "version": "简体中文",
+      "url": "zh-CN/prompt-library"
+    },
+    {
       "name": "Changelog",
-      "url": "changelogs"
+      "version": "English",
+      "url": "en/changelogs"
+    },
+    {
+      "name": "更新日志",
+      "version": "日本語",
+      "url": "ja/changelogs"
+    },
+    {
+      "name": "更新日志",
+      "version": "简体中文",
+      "url": "zh-CN/changelogs"
     }
   ],
   "primaryTab": {
@@ -27,9 +53,22 @@
   },
   "anchors": [
     {
-      "name": "Discord",
-      "icon": "discord",
-      "url": "https://discord.gg/flux"
+      "name": "Author's Twitter",
+      "icon": "x-twitter",
+      "url": "https://twitter.com/hellojimmywong",
+      "version": "English"
+    },
+    {
+      "name": "作者の Twitter",
+      "icon": "x-twitter",
+      "url": "https://twitter.com/hellojimmywong",
+      "version": "日本語"
+    },
+    {
+      "name": "作者的 Twitter",
+      "icon": "x-twitter",
+      "url": "https://twitter.com/hellojimmywong",
+      "version": "简体中文"
     },
     {
       "name": "ComfyUI 101",
@@ -42,69 +81,166 @@
       "group": "Welcome",
       "version": "English",
       "pages": [
-        "introduction"
+        "en/introduction"
       ]
     },
     {
       "group": "ようこそ",
-      "version": "Japanese",
+      "version": "日本語",
       "pages": [
-        "introduction-jp"
+        "ja/introduction"
       ]
     },
     {
       "group": "欢迎",
-      "version": "Chinese",
+      "version": "简体中文",
       "pages": [
-        "introduction-cn"
+        "zh-CN/introduction"
       ]
     },
     {
       "group": "Basics",
       "version": "English",
       "pages": [
-        "basics/flux-model"
+        "en/basics/flux-model",
+        "en/basics/flux-comfyui-workflow",
+        "en/basics/flux-prompt",
+        "en/basics/flux-with-lora",
+        "en/basics/flux-inpainting-and-outpainting"
       ]
     },
     {
-      "group": "ようこそ",
-      "version": "Japanese",
+      "group": "基礎",
+      "version": "日本語",
       "pages": [
-        "basics/flux-model-jp"
+        "ja/basics/flux-model",
+        "ja/basics/flux-comfyui-workflow",
+        "ja/basics/flux-prompt",
+        "ja/basics/flux-with-lora",
+        "ja/basics/flux-inpainting-and-outpainting"
       ]
     },
     {
       "group": "基础",
-      "version": "Chinese",
+      "version": "简体中文",
       "pages": [
-        "basics/flux-model-cn"
+        "zh-CN/basics/flux-model",
+        "zh-CN/basics/flux-comfyui-workflow",
+        "zh-CN/basics/flux-prompt",
+        "zh-CN/basics/flux-with-lora",
+        "zh-CN/basics/flux-inpainting-and-outpainting"
+      ]
+    },
+    {
+      "group": "Advanced",
+      "version": "English",
+      "pages": [
+        "en/intermediate/flux-redux",
+        "en/intermediate/flux-canny-control",
+        "en/intermediate/flux-depth-control",
+        "en/intermediate/flux-with-ipa",
+        "en/intermediate/flux-with-pulid"
+      ]
+    },
+    {
+      "group": "進階",
+      "version": "日本語",
+      "pages": [
+        "ja/intermediate/flux-redux",
+        "ja/intermediate/flux-canny-control",
+        "ja/intermediate/flux-depth-control",
+        "ja/intermediate/flux-with-ipa",
+        "ja/intermediate/flux-with-pulid"
+      ]
+    },
+    {
+      "group": "进阶",
+      "version": "简体中文",
+      "pages": [
+        "zh-CN/intermediate/flux-redux",
+        "zh-CN/intermediate/flux-canny-control",
+        "zh-CN/intermediate/flux-depth-control",
+        "zh-CN/intermediate/flux-with-ipa",
+        "zh-CN/intermediate/flux-with-pulid"
+      ]
+    },
+    {
+      "group": "Advanced",
+      "version": "English",
+      "pages": [
+        "en/advanced/changing-models-clothes-by-using-flux",
+        "en/advanced/logo-to-product-by-using-flux",
+        "en/advanced/fine-tune-flux",
+        "en/advanced/get-inspiration"
+      ]
+    },
+    {
+      "group": "高級",
+      "version": "日本語",
+      "pages": [
+        "ja/advanced/changing-models-clothes-by-using-flux",
+        "ja/advanced/logo-to-product-by-using-flux",
+        "ja/advanced/fine-tune-flux",
+        "ja/advanced/get-inspiration"
+      ]
+    },
+    {
+      "group": "高级",
+      "version": "简体中文",
+      "pages": [
+        "zh-CN/advanced/changing-models-clothes-by-using-flux",
+        "zh-CN/advanced/logo-to-product-by-using-flux",
+        "zh-CN/advanced/fine-tune-flux",
+        "zh-CN/advanced/get-inspiration"
+      ]
+    },
+    {
+      "group": "Prompt Library",
+      "version": "English",
+      "pages": [
+        "en/prompt-library/library"
+      ]
+    },
+    {
+      "group": "提示词库",
+      "version": "日本語",
+      "pages": [
+        "ja/prompt-library/library"
+      ]
+    },
+    {
+      "group": "提示词库",
+      "version": "简体中文",
+      "pages": [
+        "zh-CN/prompt-library/library",
+        "zh-CN/prompt-library/game-design"
       ]
     },
     {
       "group": "Changelog",
       "version": "English",
       "pages": [
-        "changelogs/updates"
+        "en/changelogs/updates"
       ]
     },
     {
       "group": "更新日志",
-      "version": "Japanese",
+      "version": "日本語",
       "pages": [
-        "changelogs/updates-jp"
+        "ja/changelogs/updates"
       ]
     },
     {
       "group": "更新日志",
-      "version": "Chinese",
+      "version": "简体中文",
       "pages": [
-        "changelogs/updates-cn"
+        "zh-CN/changelogs/updates"
       ]
     }
   ],
   "topbarCtaButton": {
     "name": "Try Flux",
-    "url": "https://flux.com"
+    "url": "https://google.com"
   },
   "versions": [
     {
@@ -113,19 +249,18 @@
       "default": true
     },
     {
-      "name": "Japanese",
+      "name": "日本語",
       "locale": "jp"
     },
     {
-      "name": "Chinese",
+      "name": "简体中文",
       "locale": "cn"
     }
   ],
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://twitter.com/hellojimmywong",
+      "github": "https://github.com/thinkingjimmy/flux101"
     },
     "links": [
       {

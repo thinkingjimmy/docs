@@ -1,0 +1,121 @@
+---
+title: Flux 提示词
+description: '本章会介绍如何使用 prompt 来调整图片风格。同时介绍一些更高效的方法。'
+icon: 'font'
+---
+
+<Frame caption="本图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-prompt/flux-prompt-header-image.png"
+    alt="Flux Prompt Header Image"
+  />
+</Frame>
+
+了解完 ComfyUI 的所有基础节点和操作后，你应该就能使用 ComfyUI 生成图片了。
+
+但是，生成的图片效果可能并不是你想要的，比如你想要生成的图片是动漫风格的，但生成的图片却是真人风格的，这时你就需要通过某些手段让 AI 生成特定风格的图片。要想调整图片风格，有多种方法：
+
+- 方法一：通过 prompt 来影响生成图片的效果。这个是最简单的做法。基本上使用 default workflow 就能实现。本章会介绍如何使用 prompt 来调整图片风格。同时介绍一些更高效的方法。
+- 方法二：通过加载不同的 Flux Fine-Tune 模型来影响生成图片的效果。这个是最简单的做法。但目前 Flux 的模型比较大，fine-tune 成本比较高，所以相对来说 Flux 的 fine-tune 模型数量并不多。
+- 方法三：通过 LoRA 来影响生成图片的效果。这个方法稍微复杂一些，但是相较于方法一，但因为其 fine-tune 成本低，所以现在可用的模型会更多，而且文件也小非常多。你可以在 [Flux LoRA ](./flux-with-lora) 中查看详细介绍。
+
+## 1. Flux 比你想象中的要聪明
+
+首先，我在前一章中提到 Flux 用到了一个 t5xxl_fp16 的模型，这个模型在语意理解上要比 Stable Diffusion 的模型好很多。但这个模型也导致了撰写 Flux 的 prompt 要比 Stable Diffusion 更复杂。
+
+根据我的实验，以及一些 Flux 用户的反馈，我总结了以下几个洞察：
+
+### 洞察一：Prompt 不是越长越好
+
+在撰写 Stable Diffusion 的 Prompt 时，如果撰写的 Prompt 很短，生成的图片内容会相对比较简单，缺失不少内容。所以很多人会倾向于很详细地描述图片内容，并将 Prompt 写得非常长。但在 Flux 中：
+
+1. 如果你给它太多的词，它会总结。你的 5000 字提示被压缩到大约 100 个标记（Token）。
+2. 如果你给它太少的词，它则会填补空白。比如你的提示词是 “Girl at the beach”，只有三个词。Flux 的 T5 模型会自动填充一些其他相关的东西，比如沙子，蓝天等等。
+
+
+### 洞察二：它能理解语法以及词语背后的含义
+
+另一个 Flux 比 Stable Diffusion 更聪明的地方在于，它能理解语法以及词语背后的含义。
+
+所以你不在需要，将图中的关键信息通过一个个的关键词进行分割，并使用各种符号去增加某些的词的权重。而是使用自然语言来描述你的意图。或者换句话来说，你只需要像平时说话一样，描述你的意图即可。
+
+像 Stable Diffusion 无法理解的 “左边”，“右边”，“上面”，“下面”，在 Flux 中你都可以很自然地使用，它都能理解。比如以下这张图的 Prompt 是：
+
+```
+A dog and a cat are both standing on a red box. 
+In the middle, there is a blue ball with a parrot standing on top of it. 
+The box has "I ❤️ Flux" written on it.
+```
+
+结果是这样的，位置信息基本都是正确的，它甚至连 emoji 都能识别：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-prompt/flux-prompt-1.png"
+    alt="Flux Prompt 1"
+  />
+</Frame>
+
+
+### 洞察三：具体且肯定的词语对模型的影响更大
+
+不确定是不是我个人的错觉，总之我发现具体且肯定的词语对模型的影响更大。
+
+你需要做的就是，尽可能地具体且肯定地描述你的意图。画面中需要什么元素，就直接描述什么元素。而不是使用概念模糊的词。同时尽量使用肯定的词语，而不是否定的词语。比如 Remove，或 Not Include 这种词。这种词在 Flux 中基本是无效的。
+
+## 2. Prompt 模板
+
+虽然 Flux 的 prompt 很智能，但你也可以通过使用 Prompt 模板来帮助你更好地组织你的 Prompt。一般 Prompt 需要包含以下元素：
+
+1. Object：画面中需要出现的主题元素。并尽量只描述必要的细节，比如位置，动作，颜色，大小等。
+2. Environment：画面中的环境。比如背景是什么，或者光线是怎么样的。
+3. Style：画面中的风格。比如是卡通，还是写实，或者赛博朋克等等。
+
+基本上只要包含以上三个元素，就能生成一张不错的图片了。
+
+如果你好像要做一些控制，你还可以添加：
+
+- Medium：图片拍摄的媒介。比如自拍，或者用胶卷相机拍摄，甚至是使用 Studio 灯光拍摄。
+- Artists：如果 Style 还不够，还能指定某位艺术家（但需要注意，Flux 好像只对一些离世的艺术家有效）。
+- Time：如果 Style 还不够，还能指定图片的年代。
+
+## 3. 写好 Prompt 的关键
+
+看了以上内容，你可能会觉得，写好 Flux 的 Prompt 好像很简单。但是，我认为绝大数人（包括我）其实很难一次就生成你脑海中满意的图片。原因是：
+
+1. 绝大多数人缺乏对美的认知：这是一个很大的问题，因为你不知道你想要的图片是什么样的，所以你也不知道该怎么写 prompt。
+2. 绝大多数人缺乏美术相关知识：即使你知道什么是美，但是你不知道该怎么表达出来，比如如果你根本不知道世界上有一名画家叫「梵高」，那你不可能会在 prompt 里写出「梵高风格」这样的词语。
+
+所以，我建议你多看一些别人的 prompt 是怎么写的，然后模仿着写。为了让大家能更好地学习参考，我会在 [Flux 提示词库](../prompt-library/library.mdx) 里分享一些优秀的 prompt。
+
+## 4. Prompt 辅助插件
+
+最后，我再推荐一个辅助写 Prompt 的插件 [Bilbox ComfyUI](https://github.com/syllebra/bilbox-comfyui)。这个插件可以帮你更好地组织你的 prompt。
+
+你可以通过 ComfyUI Manager 安装此插件，亦或者通过 Git Clone 的方式安装。详细的安装方式，可以参考[安装 ComfyUI 插件](https://comflowy.com/advanced/how-to-install-comfyui-extension)一文。
+
+<Note>
+  注意，这个插件比较适合写相片类图片的 prompt。
+</Note>
+
+使用方法很简单，首先需要在 `CLIP Text Encode` 节点（图中①）前插入一个 `BilboX` 节点（图中②），并将其与 `CLIP Text Encode` 节点的 `text` 端点相连。然后根据插件的提示，填写或选择你需要的 Prompt 即可。比如下图，我选择了街拍照，还添加了一些光线的选择。最后生成的图非常完美：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-prompt/flux-bilbox.png"
+    alt="Flux Bilbox"
+  />
+</Frame>
+
+另外，可能有人不知道如何将 `CLIP Text Encode` 节点的 `text` 端点显示出来。其实很简单，只需要在 `CLIP Text Encode` 节点（图中①）上右键，然后在菜单中选择 `Convert Widget to Input` （图中②），然后选择 `Convert text to input`（图中③）即可。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-prompt/flux-bilbox-show-inputs.png"
+    alt="Flux Bilbox Show Inputs"
+  />
+</Frame>

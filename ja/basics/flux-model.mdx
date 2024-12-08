@@ -1,0 +1,247 @@
+---
+title: 'Flux 模型紹介'
+description: 'Flux モデルの基礎紹介。'
+icon: 'check'
+---
+
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-logo-with-leaf-light.png"
+    alt="Flux Model"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-logo-with-leaf-dark.png"
+    alt="Flux Model Dark"
+  />
+</Frame>
+
+## 1. Flux モデル概要
+
+Flux モデル、正式名称 FLUX.1、は [Black Forest Labs](https://blackforestlabs.ai/) によって発表された最先端のテキストから画像生成モデルです。
+Black Forest Labs は Stability AI のコアメンバーである Robin Rombach によって設立された会社で、画像生成技術に焦点を当てています。会社は $3200 万ドルの投資で設立されました。
+
+<Frame caption="Black Forest Labs のウェブサイト">
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/flux-website.png"
+    alt="Flux Website"
+  />
+</Frame>
+
+### 1.1 Model Versions
+
+Flux モデルには、異なる使用シナリオとニーズに対応するために、FLUX.1 Pro、FLUX.1 Dev、FLUX.1 Schnell の3つのバージョンが含まれています。
+  - **FLUX.1 Pro**：ソースコードが閉じられたモデルで、最も高いパフォーマンスを提供します。現在は API を通じてのみ使用できます。または、この API を呼び出すアプリケーションを使用します。
+  - **[FLUX.1 Dev](https://huggingface.co/black-forest-labs/FLUX.1-dev)**：オープンソースモデルで、商用利用は不可です。Pro バージョンから蒸留されたもので、画質とプロンプトフォロー能力が似ていますが、より効率的です。
+  - **[FLUX.1 Schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell)**：オープンソースモデルで、Apache 2.0 ライセンスに基づいています。ローカル開発と個人利用のために設計されており、最速の生成速度と最小のメモリ使用量を備えています。
+
+### 1.2 Model Architecture and Differences
+
+Flux モデルは Diffusion Transformer アーキテクチャに基づいており、主流の Stable Diffusion モデルアーキテクチャとは異なります。この章の後半では、Flux モデルのアーキテクチャを詳細に紹介します。Flux は新しいアーキテクチャを使用しているため、Midjourney v6.0、DALL-E 3 (HD)、SD3-Ultra などの一般的なモデルよりも以下の点で優れています。
+- 画質
+- プロンプトフォロー
+- サイズ/アスペクトの多様性
+- タイポグラフィ
+- 出力の多様性
+
+そして、FLUX.1 [schnell] は SD3-Turbo や SDXL-Lightning などの一般的なオープンソースモデルよりもパフォーマンスが優れています。比較結果は以下の通りです。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/flux-model-comparison.png"
+    alt="Flux Model Comparison"
+  />
+</Frame>
+
+### 1.3 使用方法
+
+Flux モデルは以下の方法で使用できます。
+  - **API**：Black Forest Labs の公式 [BFL API](https://docs.bfl.ml/) を通じて使用できます。
+  - **Flux Application**：ローカル呼び出しに加えて、Flux モデルはいくつかのアプリケーションで使用できます。例えば、[Comflowy](https://comflowy.com/) はさまざまなバージョンの Flux アプリケーションを提供しています。コンピュータのパフォーマンスが良くない場合、または ComfyUI をインストールできない場合は、この方法を使用してください。[Flux アプリケーション](https://comflowy.com/flux) ページを参照して Flux アプリケーションを学習して使用します。
+  - **ローカル呼び出し**：ComfyUI 上で Flux モデルを使用することもできます。Flux モデルの実装原理に興味がない場合は、以下のセクションを参照して ComflyUI で Flux モデルを使用する方法を学習します。
+
+<Card title="Flux ComfyUI Workflow" icon="object-group" href="./flux-comfyui-workflow" horizontal>
+  ComflyUI で Flux モデルを使用する方法を学習します。
+</Card>
+
+
+## 2. Fluxモデルの実装原理
+
+<Note>
+  Fluxモデルの実装原理を理解したくない場合は、この章を読み飛ばすことができます。また、Fluxモデルのアーキテクチャを理解する前に、まずStable Diffusionモデルのアーキテクチャを理解することをお勧めします。このチュートリアルを参照してください：[Stable Diffusionモデルの基礎](https://comflowy.com/basics/stable-diffusion-foundation)。
+</Note>
+
+### 2.1 Stable Diffusionモデルアーキテクチャの復習
+
+先に述べたように、Fluxモデルのアーキテクチャは、Diffusion Transformerアーキテクチャに基づいており、Stable Diffusionモデルのアーキテクチャとは異なります。そのため、Fluxモデルのアーキテクチャを紹介する前に、まずStable Diffusionモデルの全体的なフレームワークを簡単に紹介します。
+
+まず、ユーザーがテキスト命令を入力すると、それはテキストエンコーダーによって単語ベクトルに変換され、次にこれらの単語ベクトルはランダム画像データと共に画像情報作成者に送られます。一連のノイズ除去ループの後、画像データが得られ、最終的にこれらのデータはデコーダーによって人間が読める画像に変換されます。
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-framework-light.png"
+    alt="Stable Diffusion Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-framework-dark.png"
+    alt="Stable Diffusion Dark"
+  />
+</Frame>
+
+画像情報作成者のプロセスはノイズ除去ループです。アナロジーを使って説明すると、このプロセスは彫刻家が大理石を彫ることに似ています。不要な部分は削除され、残りの部分は指示に一致する彫像になります：
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-denoise-light.png"
+    alt="Stable Diffusion Denoise Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-denoise-dark.png"
+    alt="Stable Diffusion Denoise Dark"
+  />
+</Frame>
+
+より具体的に説明すると、全体のプロセスはランダムな画像が徐々に明るくなるプロセスになります：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-denoise-process.png"
+    alt="Stable Diffusion Denoise Process Light"
+  />
+</Frame>
+
+全体のプロセスには2つのポイントに注意してください。
+
+① ノイズ除去プロセス中、ノイズ予測器と呼ばれるモジュールが使用され、ノイズを予測します。
+
+このノイズ予測器は実際にはU-Netモデルです。全体のプロセスは、コンピュータがデータを圧縮してから対応するデータに入れるということを理解できます。以下の図は、そのスキーマがUのように見えるため、U-Netと呼ばれています。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/u-net-architecture.png"
+    alt="U-Net Architecture"
+  />
+</Frame>
+
+② もう1つのポイントは、ノイズ除去プロセス中、Stable DiffusionはPromptに関連するパラメータを増幅するためにCFGと呼ばれる技術を使用します。同時に、ユーザーは負のプロンプトを通じて不要なものを削除することもできます。
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-cfg-light.png"
+    alt="Stable Diffusion CFG Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-cfg-dark.png"
+    alt="Stable Diffusion CFG Dark"
+  />
+</Frame>
+
+### 2.2 Fluxモデルの主要な変更点
+
+Stable Diffusionモデルを理解した後、Fluxの実装を見てみましょう。FluxとStable Diffusionの最大の違いは、FluxがDiT（Diffusion Transformer）モデルであることです。DiTモデルの最も重要な違いは、元のDiffusionモデルのU-NetをTransformerに置き換えることです。
+
+以下の図を使って説明します。全体的なフレームワークについて、FluxはStable Diffusionと似ていますが、Text Encoder、Image Information Creator、およびImage Decoderがあります。しかし、T5エンコーダーとLinear Projectorといういくつかの追加コンポーネントがあることがわかります。
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-framework-light.png"
+    alt="Flux Model Framework Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-framework-dark.png"
+    alt="Flux Model Framework Dark"
+  />
+</Frame>
+
+#### 2.2.1 Diffusion Transformer
+
+まず、Linear Projectorを理解しましょう。このステップは、2次元のLatentデータを1次元のTokenデータに変換することです。なぜこれを行う必要があるのでしょうか？なぜなら、その後のノイズ除去プロセス（図④参照）では、DiTモデルは元のU-Netのように全体の画像のノイズを予測しません。代わりに、ブロックごとにノイズ除去を行います。このプロセスを可視化すると、以下のようになります：
+
+<Info>注：図はノイズ除去プロセスを示すために作成したものであり、実際にはモデルの状況は1次元の数字であり、その数字を可視化するためにImage Decoderを通じて画像に変換する必要があります。</Info>
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-denoise-light.png"
+    alt="Flux Model Denoise Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-denoise-dark.png"
+    alt="Flux Model Denoise Dark"
+  />
+</Frame>
+
+まず、Linear Projectorはデータをブロックに分割し、各ブロックの位置と順序を記録します。図に示されているように。そして、ノイズ予測を行うとき、左から右に予測を開始します（図①参照）。同時に、予測を行うとき、前の図のデータを予測に持ち越します。例えば、4番目のブロックを予測するとき、モデルは1番目、2番目、3番目のブロックのデータを予測に持ち越します。
+
+そして、左から右に予測した後、再び左から右に予測します（図②参照）。複数回の予測の後、最終的な画像データが得られます。
+
+複数回のノイズ除去の後、Linear Projectorはこれらの1次元のTokenデータを2次元のLatentデータに連結し、それらをImage Decoderを通じて人間が読める画像に変換します：
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-image-decoder-light.png"
+    alt="Flux Model Image Decoder Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-image-decoder-dark.png"
+    alt="Flux Model Image Decoder Dark"
+  />
+</Frame>
+
+これにはいくつかの利点があります：
+
+1. U-Netモデルはノイズ予測時にデータを圧縮して増幅するため、このプロセス中にいくつかのデータが失われる可能性があります。しかし、このTransformerアプローチを使用すると、データ損失の可能性が大幅に減少します。したがって、FluxモデルはStable Diffusionモデルよりも詳細な画像を生成します。
+2. さらに、Transformerの前方注意機構により、ノイズ予測時に前の図のデータを予測に持ち越すことができるため、FluxモデルはStable Diffusionモデルよりも画像の連続性が良くなります。特定の位置に存在しないオブジェクトが表示されることはありません。
+
+#### 2.2.2 T5 Encoder
+
+Linear Projectorに加えて、T5エンコーダーもFluxモデルの重要な変更点です。T5エンコーダーはT5モデルアーキテクチャに基づくテキストエンコーダーで、テキスト命令をモデルが理解できる単語ベクトルに変換します。そして、これらの単語ベクトルは、Latent Imageデータと共にLinear Projectorに送られ、1次元のTokenデータに変換されます。同時に、これらのデータはノイズ除去ループの入力として使用されます。可視化されたプロセスは以下の通りです：
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-t5-encoder-light.png"
+    alt="Flux Model T5 Encoder Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-t5-encoder-dark.png"
+    alt="Flux Model T5 Encoder Dark"
+  />
+</Frame>
+
+もし彫刻のアナロジーを使って説明すると、Promptを単語ベクトルに変換し、それらをLatent Imageデータに連結することは、彫刻家が標準の大理石を彫るのではなく、Promptに似た大理石を彫ることに相当します。例えば、Promptがキャラクターを彫ることを指示している場合、Stable DiffusionモデルはPromptに従ってキャラクターを彫り、標準の立方体の大理石をキャラクターに彫ります。一方、Fluxモデルはキャラクターに似た大理石を選択して彫ります。利点は明らかです。彫刻はPromptにより一貫したものになります。
+
+これが、FluxモデルがStable Diffusionモデルよりもプロンプトフォロー能力が優れている理由です。
+
+#### 2.2.3 その他の変更点
+
+上記の2つの変更に加えて、もう1つの変更点は、Fluxモデルがガイダンス蒸留モデルであることです。ノイズ除去プロセス中、CFG技術を使用しなくなりました。最大の利点は、モデルがPromptを使用して1回予測し、Promptを使用しないで1回予測する必要がないため、生成速度が速くなることです。
+
+同時に、Fluxモデルを使用するとき、負のプロンプトを入力する必要はありません。これにより、2つのグループの正のプロンプトと負のプロンプトが競合する可能性が低くなります。例えば、負のプロンプトに「醜い手」を追加すると、醜い手が少なくなるか、出現した手がより変形したものになるため、手ではないと見なされなくなります。
+
+
+## 2.3 Fluxの将来
+
+最後に、Fluxモデルのアーキテクチャに基づいて、その将来の発展方向を予測し、Fluxを学習して使用する価値がある理由を説明します。
+
+まず、DiTアーキテクチャにより、Fluxモデルは将来、画像の生成だけでなく、ビデオの生成も可能になります（もちろん、新しいモデルはFluxと呼ばれることはありません）。
+
+第二に、T5エンコーダーにより、Fluxモデルはプロンプトフォロー能力に著しい改善があります。モデルがデータを連結するとき、連結されるのはトークン化されたデータであるため、将来的には参照画像を入力として使用して、より興味深い制御を実現できる可能性があります。
+

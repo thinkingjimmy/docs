@@ -1,0 +1,89 @@
+---
+title: Flux 画像修正
+description: 'この章では、Flux を使用して画像を修正する方法を紹介します。'
+icon: 'paintbrush'
+---
+
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-modification-header-image.png"
+    alt="Flux Inpainting Header Image"
+  />
+</Frame>
+
+Flux で画像を生成したとき、画像の一部が気に入らないことがあります。例えば、画像の人の髪が気に入らないことがあります。その場合、プロンプトを `red hair` に変更して再生成することができます。しかし、この方法では、人の頭の髪が赤くなり、他の部分の画像も変更される可能性があります。
+
+また、人の画像の髪を赤くしたいが、他の部分の画像は変更したくない場合は、このようにします：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-inpainting-compare.png"
+    alt="Flux Inpainting 1"
+  />
+</Frame>
+
+Flux を使用して画像を修正して、他の部分に影響を与えない方法はあります。これには Flux の画像修正機能を使用します。
+
+## 1. Flux Fill モデルのダウンロード
+Flux Fill モデルを使用する必要があります。[ここ](https://huggingface.co/black-forest-labs/FLUX.1-Fill-dev/tree/main) から Flux Fill dev モデルをダウンロードし、`/models/diffusion_models/` ディレクトリに配置します。
+
+
+## 2. Flux Inpainting Workflow
+
+まず、特定の領域のみを修正して、他の部分に影響を与えない方法について説明します。
+
+モデルをダウンロードしたら、以下のスクリーンショットに従ってノードを接続します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードして使用します。
+
+このワークフローは Stable Diffusion 画像修正ワークフローと非常に似ています。両方とも画像を Conditioning に変換し、その後 Prompt と画像を KSampler ノードに入力します。
+
+基本的な Flux ワークフローをロードし、Load Diffusion Model ノード (①) で Flux Fill モデルを選択し、EmptySD3LatentImage ノードを InpaintModelConditioning ノード (②) に置き換え、それを Load Image ノード (③) に接続します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-inpainting-workflow.png"
+    alt="Flux Inpainting 1"
+  />
+</Frame>
+
+その後、修正したい画像を Load Image ノードに入力します。そして、右クリックして `Open in MaskEditor` (①) を選択し、MaskEditor で使用します。
+
+この時点で、`Brush` ボタン (②) をクリックし、ブラシを使用して画像に塗りつぶし、塗りつぶした領域が修正したい領域 (④) になります。塗りつぶした領域が小さいと感じた場合は、右側 (③) で修正することもできます。同時に、左側には塗りつぶした領域を消すことができるエラーステップツールがあります。塗りつぶしを完了したら、上部の保存ボタン (⑤) をクリックして修正を保存します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-inpainting-maskedit.png"
+    alt="Flux Inpainting 1"
+  />
+</Frame>
+
+塗りつぶしを完了したら、プロンプトを修正するだけです。例えば、この場合、プロンプトを `a girl with red hair` に設定します。そして、生成ボタンをクリックして画像を生成します。
+
+##  3. Flux Outpainting Workflow
+
+Flux Fill モデルは画像の一部を修正するだけでなく、画像の一部を拡大することもできます。このように：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-outpainting-compare.png"
+    alt="Flux Outpainting"
+  />
+</Frame>
+
+画像修正ワークフローを調整して、画像拡大ワークフローを構築できます。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードして使用します。
+
+まず、画像拡大のための Pad Image ノード (①) を追加し、それを Load Image ノードと InpaintModelConditioning ノードに接続します。その後、画像拡大したい領域を Pad Image for Outpainting ノードに設定します。例えば、画像の右側を 104 ピクセル、下側を 504 ピクセル拡大したい場合は、右側と下側の値を設定します。設定したら、拡大したい画像を ② にロードします。そして、プロンプトを入力します。私のプロンプトは `An orange-haired girl with a bikini on top and jeans on bottom. Blue sky background` です。そして、生成ボタンをクリックして画像を生成します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-outpainting-workflow.png"
+    alt="Flux Outpainting"
+  />
+</Frame>
+
+私のテストでは、Flux Fill は画像修正の場合よりも画像拡大の場合の方が優れているようです。そのため、満足のいく画像を得るためには、複数回生成する必要があるかもしれません。

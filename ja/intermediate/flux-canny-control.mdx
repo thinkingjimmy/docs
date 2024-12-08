@@ -1,0 +1,145 @@
+---
+title: Flux Canny Control
+description: 'この章では、Flux Canny Control を使用して類似したエッジ構造を持つ画像を生成する方法を紹介します。'
+icon: 'wrench'
+---
+
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-header-image.png"
+    alt="Flux Canny Control Header Image"
+  />
+</Frame>
+
+Flux Canny Controlを使用して、以下の画像のように、元の画像と同様のエッジ構造を持つ画像を生成できます。
+
+ワンピースの主人公の白黒スケッチをインポートし、Flux Canny Controlモデルを使用して、元の画像と同様のエッジ構造を持つカラー画像を生成しました。わずかな表情の変化を除いて、全体的な輪郭が元の画像とほぼ同じであることがわかります。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-compare.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+Flux Canny Controlモデルを使用するのに適したシナリオは多数あります。例えば：
+1. スケッチ画像の着色。
+2. アプリのロゴのリデザイン。例えば、TikTokのロゴを漫画スタイルの画像に変換する。
+3. 製品のリデザイン。例えば、ハンドバッグの画像を入力し、Fluxモデルに異なる色や素材だが同じスタイルのハンドバッグを生成させる。
+4. ゲームキャラクターのリデザイン。例えば、金属の鎧を着た戦士の画像を入力し、Fluxモデルに他の素材や色の戦士を生成させる。
+
+## 1. Flux Cannyモデルのダウンロード
+
+Flux Cannyモデルには2種類あります。1つはFluxのFlux Canny LoRAの実装で、もう1つはオープンソースコミュニティによるFlux Canny Controlnetの実装です。前者はControl LoRA技術に基づいており、後者はControlNet技術に基づいています。
+
+* Flux公式は2つのCannyモデルファイルを提供しています。要件に応じて選択できます：
+  - 1つは、Flux Canny LoRAとFlux Devを含むモデルです。[こちら](https://huggingface.co/black-forest-labs/FLUX.1-Canny-dev/tree/main)からこのモデルをダウンロードし、`/models/diffusion_models/`フォルダに配置します。このモデルはFlux Devモデルを含むため、かなり大きく、約24GBです。ただし、モデル読み込み時に1つのモデルのみを読み込めば良いという利点があります。
+  - このような大きなモデルをダウンロードしたくない場合は、[こちら](https://huggingface.co/black-forest-labs/FLUX.1-Canny-dev-lora/tree/main)から別のFlux Canny LoRAモデルをダウンロードし、`models/loras/`フォルダに配置できます。このモデルファイルは約1.24GBです。
+* 現在、Flux Canny Controlnetモデルを実装している2つのオープンソース組織があり、要件に応じて選択できます：
+  - 最初は、Shakker-LabsとInstantXが共同で開発した[Canny ControlNetモデル](https://huggingface.co/InstantX/FLUX.1-dev-Controlnet-Canny/blob/main/diffusion_pytorch_model.safetensors)です。このモデルをダウンロードし、`models/controlnet/`フォルダに配置する必要があります。また、ダウンロード時にファイル名を`instantx_flux_canny.safetensors`に変更すると、その後の使用が容易になります。
+  - もう1つは、XLabsが開発した[Flux Canny controlnet v3](https://huggingface.co/XLabs-AI/flux-controlnet-collections/tree/main)モデルです。このモデルもダウンロードし、`models/controlnet/`フォルダに配置する必要があります。
+
+## 2. Flux Canny LoRAワークフロー
+
+モデルをダウンロードしたら、Flux Canny ComfyUI ワークフローを構築します。まず、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow) で完全な Flux ワークフローをロードし、それをベースにして修正します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+
+最も大きな変更点は、追加の Flux Canny ノードグループがあることです。このノードグループは画像を Conditioning に変換し、それを Flux モデルに入力します：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-workflow.jpeg"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+まず、`InstructPixToConditioning` ノードを追加します（図①）。これは Redux ワークフローと非常に似ています。また、CLIP-ed FluxGuidance ノードに接続されます。その後、このノードに `Canny` ノード（図②）を接続する必要があります。次に、`Load Image` ノード（図③）を追加し、処理する画像を入力します。
+
+もしやりたいなら、`Canny` ノードの後に `Preview Image` ノード（図④）を追加して、Canny 画像をプレビューすることもできます。
+
+最後に、プロンプトを入力し、生成ボタンをクリックして画像を生成します。
+
+小さなヒント：もしもとの画像よりも一貫性のあるエッジ構造を持つ画像を生成したい場合は、`Canny` ノードの `Low Threshold` と `High Threshold` を高く設定してみてください。もし一般的な輪郭だけが必要な場合は、これらの値を小さく調整して、Canny 画像のエッジを少なくしてください。そうすれば、AIがプレイできるスペースが自然に広がります。
+
+## 3. Flux Canny Controlnet ワークフロー
+
+### 3.1 InstantX バージョン
+
+まず、ControlNetモデルを実行すると余分なGPUメモリを占有するため、[Flux ComfyUI Workflow](../basics/flux-comfyui-workflow)でGGUFバージョンのFluxワークフローをロードし、それをベースに修正します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4)からこのワークフローをダウンロードしてインポートします。
+
+このバージョンでは、以下の操作を行います：
+
+1. `Apply ControlNet with VAE` ノードを追加します（図①）。それを `Load VAE`、`Load ControlNet Model`（図②）、および任意の `Canny` ノード（図③）に接続します。小さな注意点：Cannyを使用する場合は、強度を0.7に設定することをお勧めします。そうすると、効果がはるかに良くなります。
+2. `Load ControlNet Model` ノードは、ダウンロードした Flux Canny Controlnet モデルを選択します。
+3. 生成された画像のサイズを入力した Canny 画像と一致させるため、`Get Image Size` ノード（図④）を追加し、それを `SD3LatentImage` ノード（図⑤）に接続します。これにより、生成された画像のサイズが入力した Canny 画像のサイズと一致します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-shakker-workflow.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+また、GGUFバージョンを使用したくない場合は、ComfyUI公式が提供するFP8バージョンを使用できます。`Load VAE` ノードと `DualCLIPLoader` ノードを削除し、`Load Checkpoint` ノードに置き換えるだけです。そして、FP8バージョンのFluxモデルを選択します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-fp8-workflow.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+個人的には、InstantXバージョンのFlux Canny Controlnetモデルの方が優れていると感じています。元の画像では、悲しそうなルフィが生成されましたが、Flux公式のCannyモデルでは、悲しそうなルフィが笑顔のルフィに変わりました。CannyエッジはInstantXバージョンの方が優れています。
+
+### 3.2 XLabs バージョン
+
+XLabsバージョンのFlux Canny Controlnetモデルを使用するには、XLabsが開発したプラグインを使用する必要があります。これは彼らのGithub [プラグインアドレス](https://github.com/XLabs-AI/x-flux-comfyui)です。ComfyUIのComfyUI-Managerを通じてこのプラグインをインストールできます。詳細なインストール方法については、[Install ComfyUI Plugin](https://comflowy.com/advanced/how-to-install-comfyui-extension) 記事を参照してください。
+
+インストール後、Shakker-Labsバージョンのワークフローを修正できます。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4)からこのワークフローをダウンロードしてインポートします。
+
+修正はそれほど難しくありません：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">図</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>KSamplerノードをXlabs Samplerノードに置き換えます。このノードには追加の `controlnet_condition` 入力があります。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>`CLIPTextEncode` ノードを `CLIPTextEncodeFlux` ノードに置き換えます。このノードは、Clip l と t5xxl を個別に制御できます。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>`Apply ControlNet VAE` ノードを `Apply Flux ControlNet` ノードに置き換えます。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>`Load ControlNet Model` ノードを `Load Flux ControlNet` ノードに置き換え、ダウンロードした Flux Canny Controlnet モデルを選択します。</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>`Empty Latent Image` ノードを使用しました。これは、SD3バージョン以外にも最も基本的なバージョンを使用できることを示しています。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-xlabs-workflow.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+個人的には、XLabsバージョンのFlux Canny Controlnetモデルは平均的な性能であると感じています。

@@ -1,0 +1,191 @@
+---
+title: Flux 图像变体
+description: '在本章中，我们将介绍如何使用 Flux Redux 生成相似的图像。'
+icon: 'clone'
+---
+
+<Frame caption="本图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-header-image.png"
+    alt="Flux Redux Header Image"
+  />
+</Frame>
+
+如果你有用过 Midjourney 应该有用过他们的一个叫 Variation 的功能。Flux 的 Redux 模型就是为了实现这一功能所训练出来的模型。
+
+没用过此功能的朋友也没有关系。
+
+你可以简单理解为，你可以将一张图输入给 Flux 模型，然后让 Flux 模型生成出一张和原图相似的图片。比如下方我将一张乐高风格的鞋子的图片输入给 Flux 模型，然后让 Flux 模型生成出一张和原图相似的图片。它不仅仅图片主体类似，连风格都会很类似。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-compare.png"
+    alt="Flux Redux"
+  />
+</Frame>
+
+这个功能比较适合用在，你已经生成了一张图片，但是你想要生成出一张和原图相似，但是又有一些不一样的图片。我们来看看如何使用 Flux 的 Redux 模型。
+
+## 1. 下载 Flux Redux 模型
+
+首先第一步，还是要下载 Flux Redux 模型。你需要去到[这里](https://huggingface.co/black-forest-labs/FLUX.1-Redux-dev/tree/main)下载 Flux Redux dev 模型，并将其放在 `/models/style_models` 目录下，注意是 style_models 目录，而不是 diffusion_models 目录。
+
+除了这个模型外，你还需要下载一个名为 `sigclip_vision_patch14_384` 的模型。这个模型是 Flux 用来将图片转为 Conditioning 的模型。你需要去到[这里](https://huggingface.co/Comfy-Org/sigclip_vision_384/blob/main/sigclip_vision_patch14_384.safetensors)下载此模型，并将其放在 `/models/clip_vision` 目录下。
+
+## 2. Flux Redux 基础工作流
+
+### 2.1 单图变体
+
+下载好模型后，我们来搭建 Flux Redux 的 ComfyUI 工作流。首先，你可以加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中的完整版 Flux 工作流，然后基于这个工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+最核心的变化其实就是多了一个 Flux Redux 节点组。通过这个节点组将图片转成 Conditioning，然后将其和 Prompt 一起输入到 Flux 模型中。
+
+你可能初看这个节点组会觉得很复杂，但你可以简单听我解释下。你就能记住这个节点组该如何配置了。首先，这个 Redux 的能力是让模型生成一个与输入图类似风格的图片。所以它最关键的节点是 `Apply Style Model` 节点（图中①），然后这个节点输出是 Conditioning，所以需要跟 BasicGuider 节点相连。
+
+然后这个 `Apply Style Model` 节点有以下几个输入节点：
+
+1. Conditioning：正如我前面提到的那样，Redux 是将 Prompt 和图片一起输入到 Conditioning，所以这个 Conditioning 需要跟 CLIP 后的 FluxGuidance 节点相连。
+2. Style Model：这个就是要连 Flux Redux 模型，双击空白处，搜索 `Load Style Model` 节点（图中②），然后添加到工作流中，然后将其和 `Apply Style Model` 节点相连，并选择我们前面下载好的 Flux Redux 模型。
+3. Clip_vision_output：搜索 `Clip Vision Encode` 节点（图中③），然后添加到工作流中，然后将其和 `Load CLIP Vision` 节点（图中④）以及 `Load Image` 节点（图中⑤）相连。
+
+<Note>
+这里需要注意，图中③的 `Clip Vision Encode` 有个额外的 `crop` 参数。这是什么意思? 它会对你的图片进行裁剪，然后只对裁剪后的图片进行编码。如果你选择 Center 就意味着会裁切图片的中间部分。为何需要裁切？因为 Redux 模型只能接收方形图片。所以你的输入图最好是正方形，不然最后生成的图可能不会包含里图片里的所有元素。
+</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-workflow.jpeg"
+    alt="Flux Redux"
+  />
+</Frame>
+
+我们完整解释下，整个 Redux 的节点组。其实就是使用 `sigclip_vision_patch14_384` 的模型将图片转为 Vision（简单理解就是一堆词向量），然后再用 Redux 模型将 Vision 数据转为 Conditioning（简单理解就是转为 Flux 能理解的向量），然后将其和 Prompt 一起输入到 Flux Redux 模型中，最后将 Flux Redux 模型的输出和原图一起输入到 Flux 模型中，生成出图片。
+
+简单理解可以将这个过程理解为，用 Flux Redux 模型就像一个翻译。它将图片里的各种元素翻译成 Flux 模型能理解的 Conditioning 数据，然后再输入到 Flux 模型中生成出图片。
+
+### 2.2 两图融合
+
+除了可以用单张图生成变体外，你还可以试试将两张图通过 Redux 模型融合在一起。基于上面的工作流，我们只需要增加一个 `Batch Images` 节点（图中①），然后将其和第二个 `Load Image` 节点（图中②）相连。
+
+然后选择两张你想要融合的图片，比如我是将一张沙发和一张森林的图片融合在一起，你将会得到了一张很有意思的图片。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-batch-images-workflow.jpeg"
+    alt="Flux Redux Batch Image"
+  />
+</Frame>
+
+## 3. 降低 Flux Redux 权重
+
+在使用上面的工作流的时候，你可能会发现，Prompt 的权重极低，你基本上无法通过 Prompt 去更改图片的内容，亦或者是风格。这是什么原因？
+
+前面提到了 Flux Redux 模型就像一个翻译。它将图片里的各种元素翻译成 Flux 模型能理解的 Conditioning 数据，然后再输入到 Flux 模型中生成出图片。这些翻译的数据，会添加到你的 Prompt 后面。
+
+但是因为你写的 Prompt 通常非常简短，一般在 255 或 512 个 token。相比之下，Redux 为你 Text 的 Prompt 长达 729 个 token。这可能是你原始 Prompt 的 3 倍。
+
+那如果我想更多地通过 Prompt 去控制图片的内容，该怎么办？从数学的角度看，方法有两种：
+
+1. 减小 Redux 的权重，或者说缩短 Redux 的 Prompt 长度。
+2. 增加 Text 的权重，或者说增加你 Prompt 的长度。
+
+这两种方法各有优缺点，效果好坏很多时候取决于你的输入图，所以各位可以根据自己的需求都尝试下。
+
+### 3.1 通过插件降低 Redux 权重
+
+首先，先说第一种方法。为了解决这个问题，有开源开发者开发了这个[插件](https://github.com/kaibioinfo/ComfyUI_AdvancedRefluxControl)，允许你更好地对 Redux 模型进行控制。
+
+你可以通过 ComfyUI Manager 安装此插件，亦或者通过 Git Clone 的方式安装。详细的安装方式，可以参考[安装 ComfyUI 插件](https://comflowy.com/advanced/how-to-install-comfyui-extension)一文。
+
+安装完插件后，只需要修改工作流里的 Redux 的节点组：
+
+1. 去掉 `Apply Style Model` 节点。换成图中 ① 的 `Redux Advanced` 节点。
+2. 修改 Text Prompt。
+3. 最后你就能得到一个和输入图相似，但内容由 Text Prompt 控制的图片。比如下方案例，就是从乐高风格的篮球鞋，转化成了乐高风格的跑鞋。
+
+有以下几点需要注意：
+1. 你需要调整图中 ① 的 `Redux Advanced` 节点 的 `downsampling_factor` 参数。这个参数的值越大，Image Prompt 的权重越低。3 大概是 medium 的强度。你可以根据自己情况测试一下各个值的效果。
+2. 除了调整 `downsampling_factor` 参数外，你还可以调整 `downsampling_function` 参数。可以切换成不同的参数试试。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-plugin.png"
+    alt="Flux Redux Plugin"
+  />
+</Frame>
+
+这个插件除了这种使用用法外，还可以通过 Mask 的方式，圈定一些你想要的元素。比如我们这个案例，我只需要保留乐高风格，但我不需要保留鞋子本身，那我只需要将 `Load Image` 节点的 `Mask` 端点与 `Redux Advanced` 节点里的 `Mask` 端点相连，然后圈定一些了一些区域：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-plugin-mask.png"
+    alt="Flux Redux Plugin Mask"
+  />
+</Frame>
+
+### 3.2 增加 Text Prompt 权重
+
+再说下第二种方法，增加 Text 的权重，或者说增加 Text Prompt 的长度。工作流如下：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-text-weight-workflow.png"
+    alt="Flux Redux Text Weight Workflow"
+  />
+</Frame>
+
+我在工作流里增加了如图所示 ① 和 ② 两个节点，分别控制 Strength ，我加强了 Text Prompt 的权重，降低了 Redux 的权重，整体来看，效果一般。虽然 Text Prompt 的权重提高了，生成的图的确是 running shoes，但是风格上并没有保留乐高风格。
+
+所以我又切换了个思路。我先将 Text Prompt 传递给模型，然后再将 Redux 处理的数据再传递给模型，这样生成的图片里会先包含 Text Prompt 的内容，然后再根据 Redux 的数据进行调整。从而保证了 Text Prompt 的权重。
+
+工作流的修改相对比较简单，只需要修改 Redux 的节点组：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">图示</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>我添加了一个`ConditioningSetTimestepRange` 节点，然后为了更好区分，我将它命名为 `Prompt Conditioning`。然后将其和 `FluxGuidance` 节点相连。并设置 start 为 0，end 为 0.1。这就意味着最后生图的过程中，Text Prompt 的占比会达到 10%。如果你想让 Prompt 权重更高，你可以将 end 的值设置得更大一些。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>再添加一个`ConditioningSetTimestepRange` 节点，然后为了更好区分，我将它命名为 `Image Conditioning`。然后将其和 `Apply Style Model` 节点相连。并设置 start 为 0.1，end 为 1。这就意味着最后生图的过程中，Image Conditioning 的占比会达到 90%。注意这里的 start 必须是大于 Prompt Conditioning 的 end 的值。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>添加一个 `Conditioning Combine` 节点，然后将其和 `Prompt Conditioning` 以及 `Image Conditioning` 相连。 注意 `Prompt Conditioning` 是第一个输入。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>然后我在 Text Prompt 里填写了 “running shoes”</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>生成的图片主体就是 Running Shoes 了，但风格仍然是输入图的乐高风格。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Note>
+  需要注意，最后生成的图是否满足你的需求，取决于你如何分配 `Prompt Conditioning` 和 `Image Conditioning` 的占比，你可以根据自己的需要进行调整。
+</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-text-weight.png"
+    alt="Flux Redux Text Weight"
+  />
+</Frame>

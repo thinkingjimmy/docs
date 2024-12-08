@@ -1,0 +1,83 @@
+---
+title: Flux LoRA
+description: '本章会介绍如何使用 Flux LoRA 来调整图片风格。'
+icon: 'palette'
+---
+
+<Frame caption="本图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-header-image.png"
+    alt="Flux LoRA Header Image"
+  />
+</Frame>
+
+## 1. 下载 Flux LoRA 模型
+
+目前有不少 Flux LoRA 模型，大部分都共享在 Hugging Face 上。你可以通过 Hugging Face 搜索功能找到它们。
+
+但 Hugging Face 的搜索功能并不好用，你可以通过以下方式进行搜索筛选：
+
+1. 点击顶部的 `Models` 按钮。
+2. 在左侧点击  `Text to Image` 。
+3. 然后在右侧的搜索框中输入 `flux lora`。这样就能得到所有 Flux LoRA 模型了。
+4. 最后，你可以通过点击右侧的 `Sort` 按钮切换下排序方式，比如 `Most Downloads`。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-search.jpeg"
+    alt="Flux LoRA Search"
+  />
+</Frame>
+
+选择一个你喜欢的 Flux LoRA 模型，点击进入后，点击 `Files and versions` 按钮（图中①），然后下载 LoRA 文件（图中②）。然后将文件放在 `/models/loras` 目录下。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-files.png"
+    alt="Flux LoRA Files"
+  />
+</Frame>
+
+## 2. FLux LoRA 工作流
+
+下载好模型后，我们来搭建 Flux LoRA 的 ComfyUI 工作流。首先，你可以加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中我推荐的完整版 Flux 工作流，然后基于这个工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+改动比较少，你只需要添加一个 `LoraLoaderModelOnly` 节点（图中①）即可，注意是 `LoraLoaderModelOnly` 而不是 `LoraLoader`。因为我们只需要加载 LoRA 模型，不需要 Clip模型。
+
+然后选择你下载好的 Flux LoRA 模型，你可以通过设置 `strength_model` 参数（图中②）来调整 LoRA 模型对图片生成的影响程度，数值越高，影响越大。你不要在 Prompt 里添加 LoRA 相关的参数配置，这样做几乎没有效果。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-single-lora-workflow.jpeg"
+    alt="Flux Single LoRA Workflow"
+  />
+</Frame>
+
+
+## 3. 串联多个 LoRA 模型
+
+除了串联一个 LoRA 模型，你还可以串联多个 LoRA 模型。这样两个 LoRA 模型会叠加起来对生成图片产生影响，从而生成出更符合你预期的图片。
+
+只需要添加多个 `LoraLoaderModelOnly` 节点，然后分别选择你下载好的 Flux LoRA 模型即可。比如下面这个工作流我就添加了两个 Flux LoRA 模型，一个是 Flux-Super-Realism-LoRA，另一个是 Flux-Midjourney-Mix2-LoRA。前者能让生成图片的风格更加真实，后者则能让生成图片的风格更加接近 Midjourney。图片会看起来更精美，视觉风格也会更好。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-multiple-lora-workflow.jpeg"
+    alt="Flux Multiple LoRA Workflow"
+  />
+</Frame>
+
+另外，还有一个小技巧，你可以通过右键点击 `LoraLoaderModelOnly` 节点，然后选择 `Bypass` 来临时跳过某个 LoRA 模型。当你不需要某个 LoRA 模型时，这样做会方便很多。不需要删除节点，并重新连线：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-lora/flux-lora-bypass.png"
+    alt="Flux LoRA Bypass"
+  />
+</Frame>

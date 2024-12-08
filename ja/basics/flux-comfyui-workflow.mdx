@@ -1,0 +1,267 @@
+---
+title: Flux ComfyUI ワークフロー
+description: 'この章では、ComfyUI で Flux モデルを使用する方法を紹介します。'
+icon: 'object-group'
+---
+
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/lettermark-of-flux-with-leaf-light.png"
+    alt="Flux Lettermark"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/lettermark-of-flux-with-leaf-dark.png"
+    alt="Flux Lettermark Dark"
+  />
+</Frame>
+
+<Note>この章では、ComfyUI で Flux モデルを使用する方法を紹介します。ComfyUI に不慣れな場合は、[ComfyUI 101](https://www.comflowy.com/docs) チュートリアルを先に読んでください。</Note>
+
+ComfyUI で Flux を使用する方法は以下の4つです。
+
+1. **Full version of Flux**：この Flux モデルファイルには Text Encoder と VAE モデルが含まれていないため、他のモデルをダウンロードする必要があります。この方法は、VRAM が 24GB 以上、メモリが 32GB 以上のユーザーに適しています。ただし、この方法で得られる画像の画質が最も高くなります。
+2. **ComfyUI official supported FP8 version of Flux**：この Flux モデルファイルには Text Encoder と VAE モデルが含まれているため、Checkpoint で直接使用できます。この方法は、VRAM が 24GB 未満のユーザーに適しています。ただし、このバージョンの Flux の画質はフルバージョンよりも劣ります。
+3. **GGUF version**：このバージョンはオープンソースコミュニティの開発者によって提供されており、小さな VRAM デバイスで Flux モデルを使用するために開発されました。開発者は Flux モデルを GGUF 形式に変換しましたが、FP8 の精度を大幅に失うことはありません。ただし、この方法では追加のプラグインをインストールする必要があります。
+4. **NF4 version**：このバージョンは GGUF と同様に、小さな VRAM デバイスで Flux モデルを使用するために開発されました。しかし、私の実験によると、NF4 は画質の予測性が最も低いバージョンです。時には画像が非常に良く、時には非常に悪くなります。一貫性の問題があると考えているため、使用しないことをお勧めします。
+
+必要に応じて適切な方法を選択してください。Flux モデルを体験したいだけなら、FP8 バージョンが良い選択です。1つのモデルをダウンロードするだけで使用できます。コンピュータのパフォーマンスが良い場合は、フルバージョンを使用することをお勧めします。
+
+コンピュータの設定が十分でなくても、フル Flux モデルを使用したい場合は、[Comflowy](https://www.comflowy.com) を使用してください。これは ComfyUI のクラウドバージョンで、高性能なクラウド GPU を使用しています。
+
+## 1. Flux フルバージョン
+### 1.1 Flux モデルのダウンロード
+
+まず、必要なモデルをローカルマシンにダウンロードします。まず、Flux モデルをダウンロードします。HuggingFace から [FLUX.1-dev](https://huggingface.co/black-forest-labs/FLUX.1-dev) または [FLUX.1-schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell) モデルをダウンロードできます。
+
+[FLUX.1-dev](https://huggingface.co/black-forest-labs/FLUX.1-dev) ページに移動し、`Files and versions` ボタン (図の①) をクリックし、`Download` ボタン (図の②) をクリックしてモデルをダウンロードします。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/huggingface.png"
+    alt="Flux Model on HuggingFace"
+  />
+</Frame>
+
+ダウンロードしたモデルは ComfyUI の `/models/diffusion_models/` ディレクトリに配置します。
+
+### 1.2 Text Encoder モデルのダウンロード
+
+次に、Text Encoder モデルをダウンロードします。前の章で説明したように、Flux は2つの Text Encoder モデルを使用します。[ここ](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main) から2つのモデルをダウンロードします。1つは `clip_l.safetensors`、もう1つは `t5xxl_fp16.safetensors` です。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/huggingface-text-encoder.png"
+    alt="Flux Text Encoder on HuggingFace"
+  />
+</Frame>
+
+コンピュータのメモリが 32GB 未満の場合は、`t5xxl_fp8_e4m3fn.safetensors` モデルをダウンロードします。ダウンロードしたモデルは ComfyUI の `/models/clip/` ディレクトリに配置します。
+
+### 1.3 VAE モデルのダウンロード
+
+最後に、VAE モデルをダウンロードします。[ここ](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors) からモデルをダウンロードします。ダウンロードしたモデルは ComfyUI の `/models/vae/` ディレクトリに配置します。
+
+### 1.4 ComfyUI ワークフローの設定
+
+#### 1.4.1 ComfyUI 公式推奨バージョン
+
+モデルをダウンロードしたら、ワークフローを構築できます。
+
+まず、ComfyUI が推奨するフルバージョンのワークフローを紹介します。以下のスクリーンショットを参照してノードを接続し、手動で接続することでフルワークフローを理解できます。
+
+また、[Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) で直接ワークフローを使用するか、このワークフローテンプレートをダウンロードしてインポートします。（また、Comflowy テンプレートの使用方法がわからない場合は、この [チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template) を読んでください）。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-workflow.png"
+    alt="ComfyUI Flux Full Workflow"
+  />
+</Frame>
+
+このワークフローを簡単に紹介します。このワークフローは ComfyUI のデフォルトの Stable Diffusion ワークフローとは非常に異なります。詳しく説明します。
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">図</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>Diffusion Model ノードを使用して Flux モデルをロードします。Black Forest Labs が提供する Flux モデルには Text Encoder と VAE モデルが含まれていないため、このノードを使用してモデルをロードし、Load Checkpoint ノードを使用しません。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>ModelSamplingFlux ノードの Base shift は、画像生成プロセスを安定させる小さな安定調整です。Maximum shift は潜在ベクトルの最大許容変更で、極端な逸脱から出力を防ぎます。2つの組み合わせにより、画像生成の安定性と柔軟性のバランスを実現できます。<br/><br/>
+      Base shift を増加させると、生成された画像はより一貫して期待された形式に近くなる可能性がありますが、わずかな詳細が失われる可能性があります。Base shift を減少させると、より多くの変更が表示され、より細かな詳細やより微妙な質感が表示される可能性があります。しかし、これは画像の安定性を低下させ、若干のアーティファクトや不一致が表示される可能性があります。<br/><br/>
+      Flux モデルで生成された画像をより現実的にするには、Maximum shift を 0.5 にし、Base shift を 0.3 に調整してみてください。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>DualClipLoader ノードを使用して Text Encoder モデルをロードします。前の章で説明したように、Flux は2つの Text Encoder モデルを使用します。そのため、このノードを使用して2つのモデルをロードします。1つは `clip_l.safetensors`、もう1つは `t5xxl_fp16.safetensors` です。`flux` タイプを選択します。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>CLIP Text Encoder ノードは DualClipLoader ノードに接続されています。これは Stable Diffusion ワークフローで使用する CLIP Text Encoder ノードと同じです。ただし、ここでは Negative Prompt ノードがありません。前の章で説明したように、Flux はガイダンス蒸留モデルであるため、Negative Prompt はありません。</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>Guidance ノードは、0から100までの値を設定できます。この値の効果は非常に微妙です。異なるプロンプトでテストしてください。生成された画像が不十分な場合は、調整してみてください。テスト後：<br/><br/>1. この値が90に設定されていても、生成された画像はまだ使用可能です。そのため、ためらわずに試してみてください。<br/><br/>
+      2. この値は特定の値でのみ効果があります。例えば、1の場合、生成された画像は暗くなります。<br/><br/>
+      3. 0~4の間では、この値を0から4に設定した場合と10から60に設定した場合の差が非常に大きくなります。そのため、より多くの効果をテストする場合は、0から4の間でテストするだけで十分です。<br/><br/>
+      4. 非常に複雑なもの、または現実世界に存在しないものを生成したい場合は、5以上の値を設定してみてください。例えば、「足のあるトマト」など。<br/><br/>
+      5. 何を使用すればよいかわからない場合は、3.5 に設定してください。</td>
+    </tr>
+    <tr>
+      <td>⑥</td>
+      <td>EmptySD3LatentImage ノードは潜在ベクトルを生成するために使用されます。SD3と名付けられていますが、実際には Flux で使用できます。</td>
+    </tr>
+    <tr>
+      <td>⑦</td>
+      <td>VAEDecode ノードは潜在ベクトルをデコードするために使用されます。ここでは、前にダウンロードした VAE モデルを使用します。</td>
+    </tr>
+  </tbody>
+</table>
+
+#### 1.4.2 私がお勧めするバージョン
+
+私は ComfyUI の公式バージョンが少し複雑であると感じているため、より簡単なバージョンをお勧めします。このバージョンでは、Stable Diffusion で一般的に使用される KSampler ノードのみを使用し、ModelSamplingFlux ノードを削除します。そのため、SD3LatentImage で幅と高さを設定するだけで済みます。一般的に、このバージョンはより簡単で理解しやすいです。
+
+また、以下に注意してください：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">図</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>Flux には Negative Prompt がないため、Negative Prompt ノードを折りたたむことができます。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>Flux はガイダンス蒸留モデルであるため、CFG 値は効果がありません。そのため、1に設定します。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+
+## 2. FP8版のFlux
+
+### 2.1 Flux Checkpoint モデルのダウンロード
+
+[ここ](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) から Flux Dev FP8 Checkpoint モデルをダウンロードできます。ダウンロードしたモデルは ComfyUI の `/models/checkpoints/ ` ディレクトリに配置します。
+
+### 2.2 ComfyUIワークフローの設定
+
+以下のスクリーンショットを参照してノードを接続するか、[Comflowy](https://app.comflowy.com/app/s-flux-dev-fp8-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+
+このバージョンは、前にお勧めしたバージョンよりもさらに簡単なバージョンです。Diffusion Model、DualCLIPLoader、および VAE ノードを Checkpoint Loader ノードに置き換えます。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-fp8-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+このワークフローは基本的に Stable Diffusion ワークフローと同じです。いくつかの変更に注意してください：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">図</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>Negative Prompt ノードが不要になったため、折りたたむことができます。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>Guidance ノードを追加しました。0から100までの値を設定できます。この値の効果は非常に微妙です。異なるプロンプトでテストしてください。生成された画像が不十分な場合は、調整してみてください。テスト後：<br/><br/>1. この値が90に設定されていても、生成された画像はまだ使用可能です。そのため、ためらわずに試してみてください。<br/><br/>
+      2. この値は特定の値でのみ効果があります。例えば、1の場合、生成された画像は暗くなります。<br/><br/>
+      3. 0~4の間では、この値を0から4に設定した場合と10から60に設定した場合の差が非常に大きくなります。そのため、より多くの効果をテストする場合は、0から4の間でテストするだけで十分です。<br/><br/>
+      4. 非常に複雑なもの、または現実世界に存在しないものを生成したい場合は、5以上の値を設定してみてください。例えば、「足のあるトマト」など。<br/><br/>
+      5. 何を使用すればよいかわからない場合は、3.5 に設定してください。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>EmptySD3LatentImage ノードは潜在ベクトルを生成するために使用されます。SD3と名付けられていますが、実際には Flux で使用できます。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>KSampler ノードの CFG 値は前の章で説明したものと同じです。Flux はガイダンス蒸留モデルであるため、CFG 値は効果がありません。そのため、1に設定します。</td>
+    </tr>
+  </tbody>
+</table>
+
+## 3. GGUF版のFlux
+
+### 3.1 GGUF版のFluxモデルをダウンロード
+
+[ここ](https://huggingface.co/city96/FLUX.1-dev-gguf/tree/main) から GGUF バージョンの Flux モデルをダウンロードできます。ダウンロードしたモデルは ComfyUI の `/models/unet` ディレクトリに配置します。
+
+多くのバージョンの GGUF が表示されます。あなたのコンピューターの構成に合わせて選択してください：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">図</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Q8_0</td>
+      <td>24GBのVRAMがある場合は、Q8バージョンを使用してください。その出力効果はFP16とほぼ同じです。他のCLIPモデルと一緒に使用する場合は、約15GBのVRAMを使用します。そのため、複数のLoRAsや画像修復モデルをロードするための余裕があります。Q8を使用してLLMをロードすることもできます。</td>
+    </tr>
+    <tr>
+      <td>Q6_K</td>
+      <td>16GBのVRAMしかない場合は、Q6_Kが最適です。小さな容量で一定の精度を提供します。他のCLIPモデルと一緒に使用する場合は、約12GBのVRAMを使用します。そのため、複数のLoRAsや画像修復モデルをロードするための余裕があります。Q6_Kを使用してLLMをロードすることもできます。</td>
+    </tr>
+    <tr>
+      <td>Q4_0 或 Q4_1</td>
+      <td>10GB未満のVRAMしかない場合は、Q4_0 または Q4_1 を使用してください。NF4を使用しないでください（個人的には、NF4は画像品質の予測性が最も低いバージョンです。時には非常に良い画像が生成され、時には非常に悪い画像が生成されます。このモデルには一貫性の問題があると思います）。NF4が悪いというわけではありません。しかし、FP16に近いモデルを探している場合は、Q4_0が必要です。</td>
+    </tr>
+  </tbody>
+</table>
+
+### 3.2 ComfyUIワークフローの設定
+
+まず、[ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) プラグインをインストールする必要があります。ここではインストール方法を繰り返しません。[ComfyUI プラグインのインストール方法](https://www.comflowy.com/advanced/how-to-install-comfyui-extension)を参照してください。
+
+プラグインをインストールした後、以下のスクリーンショットを参照してノードを接続するか、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+
+このワークフローをよく見ると、FP8バージョンのワークフローと非常に似ています。唯一の違いは、Checkpoint Loader ノードを GGUF Loader ノードに置き換えたことです（図の①）。GGUF モデルには Text Encoder モデルと VAE モデルが含まれていないため、別の DualCLIPLoader ノード（図の②）と VAE ノード（図の③）を使用する必要があります：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-gguf-workflow.jpeg"
+    alt="ComfyUI Flux GGUF Workflow"
+  />
+</Frame>
+
+VRAMがまだ不足している場合は、対応する GGUF バージョンの Text Encoder モデルをダウンロードし、DualCLIPLoader ノードを DualCLIPLoader (GGUF) ノードに置き換え、ダウンロードした Text Encoder モデルをロードします。これにより、VRAM の使用量をさらに減らすことができます。

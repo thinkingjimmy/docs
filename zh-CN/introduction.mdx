@@ -1,0 +1,143 @@
+---
+title: 介绍
+icon: 'hands-clapping'
+---
+
+<img
+  className="block dark:hidden rounded-xl"
+  src="/images/introduction/hero-light.png"
+  alt="Hero Light"
+/>
+<img
+  className="hidden dark:block rounded-xl"
+  src="/images/introduction/hero-dark.png"
+  alt="Hero Dark"
+/>
+
+👋 Hi, 朋友。感谢你的关注。
+
+本教程是一个面向新手的 Flux 教程，旨在帮助大家快速上手 Flux。本教程作者与 Black Forest Labs 无直接关系。由 [Comflowy](https://www.comflowy.com/) 提供技术支持。
+
+## 基础
+
+此部分会主要介绍模型相关的基础知识，以便大家后续更好地了解 Flux 模型。完成这基础篇后，你可以使用 ComfyUI 搭建基础的 Flux 工作流，并使用文生图的方式，输出各种各样的图。
+
+<CardGroup cols={2}>
+  <Card
+    title="Flux 模型介绍"
+    icon="check"
+    href="basics/flux-model"
+  >
+    介绍 Flux 模型的基础实现原理。理解为何 Flux 可以实现更好的控制？
+  </Card>
+  <Card
+    title="Flux ComfyUI 工作流"
+    icon="object-group"
+    href="basics/flux-comfyui-workflow"
+  >
+    本章节会介绍如何在 ComfyUI 里搭建 Flux 工作流。
+  </Card>
+  <Card
+    title="Flux 提示词"
+    icon="font"
+    href="basics/flux-prompt"
+  >
+    本章节会介绍如何使用 Flux 提示词。
+  </Card>
+  <Card
+    title="Flux LoRA"
+    icon="palette"
+    href="basics/flux-with-lora"
+  >
+    本章节会介绍如何在 Flux 生图过程中，加入 LoRA 模型。从而生成特定风格的图片。
+  </Card>
+  <Card
+    title="Flux 图像修改"
+    icon="paintbrush"
+    href="basics/flux-inpainting-and-outpainting"
+  >
+    本章节会介绍如何使用 Flux Inpainting 修改图像，以及如何使用 Flux Outpainting 扩展图像。
+  </Card>
+</CardGroup>
+
+## 进阶
+
+完成基础篇的学习后，你可能对生成的图片不满意，比如：
+
+- 对生成的图片部分内容不满意，想要对其进行修改。
+- 想要加强对生成过程的控制，比如想控制图中人物的姿势等。
+
+中级篇将会介绍更多方法，帮助你解决以上问题。完成中级篇的学习，意味着你能够相对精准地控制模型的输出。
+
+<CardGroup cols={2}>
+  <Card
+    title="Flux Redax"
+    icon="clone"
+    href="intermediate/flux-redux"
+  >
+    本章节会介绍如何使用 Flux Redux 模型，生成特定风格的图片。
+  </Card>
+  <Card
+    title="Flux Canny Control"
+    icon="wrench"
+    href="intermediate/flux-canny-control"
+  >
+    本章节会介绍如何使用 Flux Canny Control 控制图片生成。
+  </Card>
+  <Card
+    title="Flux Depth Control"
+    icon="screwdriver-wrench"
+    href="intermediate/flux-depth-control"
+  >
+    本章节会介绍如何使用 Flux Depth Control 控制图片生成。
+  </Card>
+  <Card
+    title="Flux IPA"
+    icon="image"
+    href="intermediate/flux-with-ipa"
+  >
+    本章节会介绍如何在 Flux 生图过程中，加入 IPA 模型。从而生成特定风格的图片。
+  </Card>
+  <Card
+    title="Flux PuLID"
+    icon="people-arrows"
+    href="intermediate/flux-with-pulid"
+  >
+    本章节会介绍如何使用 Flux PuLID 模型，生成特定人物形象的图片。
+  </Card>
+</CardGroup>
+
+## 高级
+
+基础和进阶篇基本上覆盖了 Flux 的官方建议的使用方式。高级篇会教大家开源社区挖掘出来的一些高级使用方式。
+
+<CardGroup cols={2}>
+  <Card
+    title="电商模特衣服更换" 
+    icon="shirt"
+    href="advanced/changing-models-clothes-by-using-flux"
+  >
+    本章节会介绍如何使用 Flux 模型更换模特衣服。
+  </Card>
+  <Card
+    title="Logo 转产品图"
+    icon="gift"
+    href="advanced/logo-to-product-by-using-flux"
+  >
+    本章节会介绍如何使用 Flux 模型将 Logo 转成产品图。
+  </Card>
+  <Card
+    title="训练 Flux LoRA" 
+    icon="palette"
+    href="advanced/fine-tune-flux"
+  >
+    本章节会介绍如何训练 Flux LoRA 模型。
+  </Card>
+  <Card
+    title="Flux 的更多使用方式"
+    icon="stars"
+    href="advanced/get-inspiration"
+  >
+    本章节会介绍 Flux 的更多使用方式。
+  </Card>
+</CardGroup>

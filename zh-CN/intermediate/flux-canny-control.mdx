@@ -1,0 +1,147 @@
+---
+title: Flux 边缘控制
+description: '在本章中，我们将介绍如何使用 Flux Canny Control 模型生成边缘结构与原图高度一致的图片。'
+icon: 'wrench'
+---
+
+<Frame caption="此图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-header-image.png"
+    alt="Flux Canny Control Header Image"
+  />
+</Frame>
+
+你除了可以使用 Flux Redux 进行图像变体外，还可以使用 Flux Canny Control 模型让 Flux 生成一张边缘结构与原图高度一致的图片，比如像下图所示的那样。
+
+我导入了一张海贼王主角路飞的黑白线稿图片，然后使用 Flux Canny Control 模型生成了一张边缘结构与原图高度一致的彩色图片。你可以看到除了表情有点变化外，整体的轮廓和原图几乎是一致的。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-compare.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+有很多场景，都适合使用 Flux Canny Control 模型。比如：
+1. 给手稿图上色。
+2. 重新设计 App Logo。比如将 TikTok 的 Logo 变成一个卡通风格的图片。
+3. 重新设计某个产品。比如输入一款手提包的图片，然后让 Flux 模型生成不同颜色，或者不同材质但款式一样的手提包。
+4. 重新设计某个游戏人物。比如输入一个身穿金属盔甲的战士图片，然后让 Flux 模型生成身穿其他材质或颜色的战士图片。
+
+
+## 1. 下载 Flux Canny 模型
+
+目前有两种 Flux Canny 模型，一种是 Flux 官方实现的 Flux Canny LoRA，另一种则是由开源社区里的其他机构实现的 Flux Canny Controlnet。前者基于 Control LoRA 技术实现，后者则是基于 ControlNet 技术实现。
+
+* Flux 官方提供了两种 Canny LoRA 模型文件，你可以根据自己需求选择：
+  - 一个是将 Flux Canny LoRA 和 Flux Dev 打包在一起的模型。你可以在[这里](https://huggingface.co/black-forest-labs/FLUX.1-Canny-dev/tree/main)下载到此模型，然后将其放在 `/models/diffusion_models/` 文件夹里。但这个模型因为包含了 Flux Dev 模型，所以体积较大，有 24GB 左右。但好处是加载模型的时候只需要加载一个。
+  - 如果你不想下载那么大的模型，可以在[这里](https://huggingface.co/black-forest-labs/FLUX.1-Canny-dev-lora/tree/main)下载到单独的 Flux Canny LoRA 模型，并将其放在 `models/loras/` 文件夹里。这个模型文件只有 1.24GB 左右。
+* 目前有两个开源机构实现了 Flux Canny Controlnet 模型，你可以根据自己需求选择：
+  - 第一个是 Shakker-Labs 和 InstantX 合作开源的 [Canny  ControlNet模型](https://huggingface.co/InstantX/FLUX.1-dev-Controlnet-Canny/blob/main/diffusion_pytorch_model.safetensors),你需要将这个模型下载并放到 `models/controlnet/` 文件夹里。另外，注意这个文件在下载的时候可以改下名字，改成 `instantx_flux_canny.safetensors`，方便后续使用。
+  - 另一个是 XLabs 开源的 [Flux Canny controlnet v3](https://huggingface.co/XLabs-AI/flux-controlnet-collections/tree/main) 模型，你也需要将这个模型下载并放到 `models/controlnet/` 文件夹里。
+
+## 2. Flux Canny LoRA 工作流
+
+下载好模型后，我们来搭建 Flux Canny 的 ComfyUI 工作流。首先，你可以加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中我推荐的完整版 Flux 工作流，然后基于这个工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+最核心的变化其实就是多了一个 Flux Canny 节点组。通过这个节点组将图片转成 Conditioning，然后将其和 Prompt 一起输入到 Flux 模型中:
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-workflow.jpeg"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+首先，需要添加一个名为 `InstructPixToConditioning ` 的节点（图中①）。与 Redux 的工作流很相似，它也是跟 CLIP 后的 FluxGuidance 节点相连。然后这个节点要跟一个 `Canny` 节点（图中②）相连。然后还需要添加一个 `Load Image` 节点（图中③），将需要处理的图片输入进去。
+
+如果需要你还可以在 `Canny` 节点后添加一个 `Preview Image` 节点（图中④），用于预览 Canny 后的图片。
+
+最后输入 Prompt，点击 Generate 按钮，生成图片。
+
+这里有个小 Tips，如果你想要生成出边缘结构与原图更加高度一致的图片，可以尝试将 `Canny` 节点的 `Low Threshold` 和 `High Threshold` 都设置得高一些。如果你只想要大体的轮廓，则可以将这些值调小一些，这样 Canny 生成的图片边缘就会少一些，让 AI 发挥的空间自然就更多了。
+
+## 3. Flux Canny Controlnet 工作流
+
+### 3.1 InstantX 版本
+
+首先，因为要额外运行 ControlNet 模型，会占用额外的显存，所以我推荐你加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中的 GGUF 版本 Flux 工作流，然后基于此工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+这个版本，你需要：
+
+1. 添加图中①所示的 `Apply ControlNet with VAE` 节点。然后将其与 `Load VAE` 、`Load ControlNet Model`（图中②） 以及任意的 `Canny` 节点（图中③）相连。有个小细节需要注意，使用 Canny 的话，最好将 strength 设置为 0.7，效果会好不少。
+2. `Load ControlNet Model` 节点选择下载好的 Flux Canny Controlnet 模型。
+3. 为了让生成的图与输入的 Canny 图大小一致，我还添加了一个 `Get Image Size` 节点（图中④），然后将其与 `SD3LatentImage` 节点（图中⑤）相连。这样生成的图片大小就与输入的 Canny 图大小一致了。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-shakker-workflow.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+另外，如果你不想使用 GGUF 版本，也可以使用 ComfyUI 官方提供的 FP8 版本，仅需要去掉 `Load VAE` 和 `DualCLIPLoader` 节点即可，并替换成 `Load Checkpoint` 节点。然后选择 FP8 版本的 Flux 模型即可。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-fp8-workflow.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+经过我个人的测试，我感觉 InstantX 版本的 Flux Canny Controlnet 模型效果会更好一些。原图中是个生气的路飞，但在 Flux 官方的 Canny 模型中，生气的路飞变成了一个微笑的路飞。在服从 Canny 边缘上没有 InstantX 版本的好。
+
+
+### 3.2 XLabs 版本
+
+使用 XLabs 版本的 Flux Canny Controlnet 模型，需要使用到 XLabs 开发的插件。这是他们的 Github [插件地址](https://github.com/XLabs-AI/x-flux-comfyui)。你可以通过 ComfyUI 的 ComfyUI-Manager 安装此插件。详细的安装方式，可以参考[安装 ComfyUI 插件](https://comflowy.com/advanced/how-to-install-comfyui-extension)一文。
+
+安装完后，你可以通过修改 Shakker-Labs 版本的工作流。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+修改起来不算太难：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">图示</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>将 KSampler 换成 Xlabs Sampler 节点。你可以看到这个节点多了个 `controlnet_condition` 的输入。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>我将 `CLIPTextEncode` 节点替换为 `CLIPTextEncodeFlux` 节点。你可以不用修改。我只想告诉各位还有其他 Flux 的 CLIP 节点。这个节点可以分别对 Clip l 和 t5xxl 进行控制。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>将 `Apply ControlNet VAE` 节点换成 `Apply Flux ControlNet` 节点。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>将 `Load ControlNet Model` 节点换成 `Load Flux ControlNet` 节点。并选择下载好的 Flux Canny Controlnet 模型。</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>`SD3LatentImage` 节点我也用了 `Empty Latent Image` 节点。也是为了展示这个节点除了 SD3 的版本外，也可以用最普通的那个。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-canny-control/flux-canny-control-xlabs-workflow.png"
+    alt="Flux Canny Control"
+  />
+</Frame>
+
+我个人认为 XLabs 版本的 Flux Canny Controlnet 模型效果就比较一般了。

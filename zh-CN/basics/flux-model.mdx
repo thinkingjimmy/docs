@@ -1,0 +1,245 @@
+---
+title: 'Flux 模型介绍'
+icon: 'check'
+---
+
+<Frame caption="此图片由 AI 生成">
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-logo-with-leaf-light.png"
+    alt="Flux Model"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-logo-with-leaf-dark.png"
+    alt="Flux Model Dark"
+  />
+</Frame>
+
+## 1. Flux 模型概述
+
+Flux 模型，全称为 FLUX.1，是由 [Black Forest Labs](https://blackforestlabs.ai/) 推出的一款前沿的文本到图像生成模型。
+Black Forest Labs 是前 Stability AI 核心成员 Robin Rombach 创立的专注图像生成技术的公司，该公司刚创立就获得了 3200 万美元的融资。
+
+<Frame caption="Black Forest Labs 官网">
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/flux-website.png"
+    alt="Flux Website"
+  />
+</Frame>
+
+### 1.1 模型版本
+
+Flux 模型包含三个版本，分别是 FLUX.1 Pro、FLUX.1 Dev 和 FLUX.1 Schnell，以满足不同的使用场景和需求。
+  - **FLUX.1 Pro**：闭源模型，提供最佳性能，适合商业应用。目前你仅能通过 API 的方式使用到它，或者使用调用该 API 的应用。 
+  - **[FLUX.1 Dev](https://huggingface.co/black-forest-labs/FLUX.1-dev)**：开源模型，不可商用，直接从 Pro 版本蒸馏而来，具有与 Pro 版本相似的图像质量和提示词遵循能力，但更高效。
+  - **[FLUX.1 Schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell)**：开源模型，基于 Apache 2.0 协议，专为本地开发和个人使用设计，具有最快的生成速度和最小的内存占用。
+
+### 1.2 模型架构与差异
+
+Flux 模型基于 Diffusion Transformer 架构，与主流的 Stable Diffusion 模型架构不同。在本章节后续的部分，我会详细介绍 Flux 模型架构。因为 Flux 采用了新的架构，所以它在图片生成的质量上，FLUX.1 [pro] 和 [dev] 在以下各方面均超越了 Midjourney v6.0、DALL-E 3 (HD) 和 SD3-Ultra 等流行模型，仅有在排版这一项落后 Ideogram： 
+- 视觉质量（Visual Quality）
+- 提示跟踪（Prompt Following）
+- 尺寸/外观变化（Size/Aspect Variability）
+- 排版（Typography）
+- 输出多样性（Output Diversity）
+
+而 FLUX.1 [schnell] 则在性能上超过了同类开源模型，比如 SD3-Turbo 和 SDXL-Lightning。 比较结果如下图所示：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/flux-model-comparison.png"
+    alt="Flux Model Comparison"
+  />
+</Frame>
+
+### 1.3 使用方法
+
+Flux 模型可以通过以下几种方式使用：
+  - **API**：通过 API 的方式使用 Flux 模型。比如 Black Forest Labs 官方提供的 [BFL API](https://docs.bfl.ml/)。
+  - **Flux 应用**：除了本地调用外，还可以在一些应用里使用 Flux 模型。比如 [Comflowy](https://comflowy.com/) 就提供了 Flux 各个版本的应用。如果电脑性能不佳，或无法安装 ComfyUI，可以考虑使用此方式。你可以前往 [Flux 应用](https://comflowy.com/flux) 页面，了解和使用 Flux 应用。
+  - **本地调用**：你还可以通过 ComfyUI 在本地电脑使用 Flux 模型。如果你对 Flux 模型的实现原理不感兴趣，你可以直接查看以下章节，了解如何在 ComflyUI 里使用 Flux 模型。
+
+<Card title="Flux ComfyUI 工作流" icon="object-group" href="./flux-comfyui-workflow" horizontal>
+  了解如何在 ComflyUI 里使用 Flux 模型。
+</Card>
+
+
+## 2. Flux 模型实现原理
+
+<Note>
+  如果你不想了解 Flux 模型的实现原理，想要看如何使用 Flux 模型，可以跳过此章节。另外，我也建议你在了解 Flux 模型架构之前，先了解下 Stable Diffusion 模型架构。你可以查看这篇教程：[Stable Diffusion 模型基础](https://comflowy.com/basics/stable-diffusion-foundation)。
+</Note>
+
+### 2.1 回顾 Stable Diffusion 模型架构
+
+正如前面所说，Flux 模型架构与 Stable Diffusion 不同，是基于 Diffusion Transformer 架构。所以，在介绍 Flux 模型架构之前，我先简单快速地介绍下 Stable Diffusion 的整体框架。
+
+首先，用户输入文字指令，该文字指令会通过 Text Encoder 转为词向量，然后这些词向量会和 Random Image 数据进入到 Image Information Creator，通过一系列的降噪循环，得到图像的数据，最后这些数据通过 Decoder 转为人肉眼可见的图片。
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-framework-light.png"
+    alt="Stable Diffusion Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-framework-dark.png"
+    alt="Stable Diffusion Dark"
+  />
+</Frame>
+
+Image Information Creator 里进行的其实是一个个的降噪循环。如果用类比的方法解释，这个过程就像是雕塑家雕刻大理石的过程，将大理石不需要的部分去掉，最后留下来的就是与指令一致的雕像:
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-denoise-light.png"
+    alt="Stable Diffusion Denoise Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-denoise-dark.png"
+    alt="Stable Diffusion Denoise Dark"
+  />
+</Frame>
+
+如果具象一点看，整个过程会是一张随机图片逐渐变清晰的过程：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-denoise-process.png"
+    alt="Stable Diffusion Denoise Process Light"
+  />
+</Frame>
+
+整个过程中，有两个点需要关注。
+
+① 在降噪的过程中，会通过一个叫 Noise Predictor 的模块对噪声进行预测。
+
+这个 Noise Predictor 里面其实是一个 U-Net 的模型。整个过程你可以理解为，计算机会先压缩数据，然后再放到相应的数据。如下图所示，因为其原理图示长得很像 U，所以才称其为 U-Net。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-model/u-net-architecture.png"
+    alt="U-Net Architecture"
+  />
+</Frame>
+
+② 另一个需要关注的是，在降噪过程中，Stable Diffusion 会通过一个叫 CFG 的技术，放大 Prompt 相关的参数。同时，用户还能通过 Negative Prompt 的方式，去掉不想要的东西。
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-cfg-light.png"
+    alt="Stable Diffusion CFG Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/stable-diffusion-cfg-dark.png"
+    alt="Stable Diffusion CFG Dark"
+  />
+</Frame>
+
+### 2.2 Flux 模型的关键变化
+
+了解完 Stable Diffusion 后，我们再来看看 Flux 的实现。Flux 与 Stable Diffusion 最大的不同是它是一个 DiT （Diffusion Transformer）模型。DiT 模型最关键的不同是将原来 Diffusion 模型里的 U-Net 替换为了 Transformer。 
+
+我用以下这张图给大家解释下。整体框架来看，Flux 与 Stable Diffusion 类似，也会有 Text Encoder，Image Information Creator 以及 Image Decoder。但你可以看到，它比 Stable Diffusion 还多了一些东西，比如 T5 Encode，Linear Projector。
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-framework-light.png"
+    alt="Flux Model Framework Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-framework-dark.png"
+    alt="Flux Model Framework Dark"
+  />
+</Frame>
+
+#### 2.2.1 Diffusion Transformer
+
+首先我们先来了解下 Linear Projector，这个环节是将二维的 Latent 数据转化为一维的 Token 数据。为何要这么做呢？因为在后续的降噪过程中（既图中的④），DiT 模型不再像原来的 U-Net 那样通过预测整张图的噪声的方式进行降噪。而是分块进行降噪。如果我们将这个过程进行可视化，会如下图所示：
+
+<Info>注意，我为了让图能表现出降噪的过程，所以图里都是肉眼可见的图，实际模型的情况是一维的数字，数字最终要经过 Image Decoder 才会转为人肉眼可见的图片。</Info>
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-denoise-light.png"
+    alt="Flux Model Denoise Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-denoise-dark.png"
+    alt="Flux Model Denoise Dark"
+  />
+</Frame>
+
+首先，Linear Projector 会对数据进行分块，并打标，记录好各个块的位置顺序。就像图中所示那样标记好顺序。然后，在降噪预测的时候，会从左往右开始预测噪声（如图中①所示）。同时在预测的时候，还会带上前序图的数据进行预测，比如在预测第四块的时候，模型会带上第一、二、三块的数据进行预测。
+
+接着，从左往右预测完后，再重新从左往右进行预测（如图中②所示），经过多轮预测后，得到最终的图像数据。
+
+进行多轮降噪后，Linear Projector 会再将这些一维的 Token 数据拼接起来，转化为二维的 Latent 数据，最后再通过 Image Decoder 转为人肉眼可见的图片：
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-image-decoder-light.png"
+    alt="Flux Model Image Decoder Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-image-decoder-dark.png"
+    alt="Flux Model Image Decoder Dark"
+  />
+</Frame>
+
+这么做有以下几个好处：
+
+1. U-Net 模型在预测噪音的时候，会对数据进行压缩和放大，在此过程中数据有可能会丢失。而采用这种 Transformer 的方式，少了压缩和放大，数据丢失的可能性会小很多。所以 Flux 模型在生成图片的细节才会比 Stable Diffusion 模型高。
+2. 另外，也得益于 Transformer 的向前注意力机制，在预测噪声的时候，可以带上前序图的数据进行预测，所以 Flux 模型在生成图片的连贯性上，也比 Stable Diffusion 模型要好。不会出现在某个位置出现不存在的物体。
+
+#### 2.2.2 T5 Encoder
+
+除了 Linear Projector 外，T5 Encoder 也是 Flux 模型的一个关键变化。T5 Encoder 是基于 T5 模型架构的文本编码器，它将文本指令转换为模型可以理解的词向量。然后这些词向量会和 Latent Image 数据一起进入到 Linear Projector 转化为一维的 Token 数据。同时这些数据还会被 Concat 到一起，作为降噪循环的输入。可视化的过程如下图所示：
+
+<Frame>
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-model/flux-model-t5-encoder-light.png"
+    alt="Flux Model T5 Encoder Light"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-model/flux-model-t5-encoder-dark.png"
+    alt="Flux Model T5 Encoder Dark"
+  />
+</Frame>
+
+如果还是拿雕塑来类比，将 Prompt 转化为词向量，然后与 Latent Image 数据 Concat 到一起，就相当于雕塑家在雕大理石的时候，不再像之前那样雕刻标准的大理石，而是雕刻与 Prompt 类似的大理石。比如 Prompt 是雕一个人物，Stable Diffusion 模型就会根据 Prompt 的描述，将一个标准正方体大理石雕刻成人物。而 Flux 模型则是挑选了一个跟人物很像的大理石进行雕刻。这样的好处也是显而易见的，雕刻出来的雕塑会更符合 Prompt 的描述。
+
+这也就是 Flux 模型在提示词遵循能力上，会比 Stable Diffusion 模型要强的原因。
+
+#### 2.2.3 其他变化
+
+除了上述的两个转变外，还有一个变化是 Flux 模型是一个引导蒸馏（guidance distilled）模型。 其在降噪的过程中，不会再使用 CFG 的技术。这样做最大的好处是，模型不需要预测两次（预测一次带 Prompt 的，一次预测不带 Prompt 的），所以生成图片的速度会更快。
+
+同时，在使用 Flux 模型的时候，也不再需要输入 Negative Prompt。这样做也减少 Positive Prompt 和 Negative Prompt 两组提示词相互竞争的可能性。比如，将“丑陋的手”添加到 Negative Prompt 中，也许你会得到更少的丑陋的手，或者它只是使任何出现的手变得更加畸形，以至于它们不再被视为手。
+
+
+## 2.3 Flux 的未来
+
+最后我们再根据 Flux 模型的架构，预测下 Flux 模型未来的发展方向。以及为何 Flux 值得我们去学习使用。
+
+首先，得益于 DiT 的架构，Flux 模型未来不仅仅可以生成图片，还可以生成视频（当然，新的模型未必会叫 Flux）。
+
+第二，得益于 T5 Encoder，Flux 模型在提示词遵循能力上有较大的提升。并且模型在将数据 concat 的时候，是 Token 化后的数据 Concat 到一起，所以我们未来完全可以尝试将参考图片作为输入，实现更多有意思的控制。

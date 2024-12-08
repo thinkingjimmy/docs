@@ -1,0 +1,191 @@
+---
+title: Flux Redux
+description: 'この章では、Flux Redux を使用して類似画像を生成する方法を紹介します。'
+icon: 'clone'
+---
+
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-header-image.png"
+    alt="Flux Redux Header Image"
+  />
+</Frame>
+
+Midjourneyを使用したことがある方は、そのVariation機能をご存知でしょう。Fluxの Reduxモデルは、この機能を実現するためにトレーニングされています。
+
+この機能を使用したことがない方も心配する必要はありません。
+
+簡単に言えば、Fluxモデルに画像を入力し、元の画像に似た画像を生成させることができます。例えば、レゴスタイルの靴の画像をFluxモデルに入力し、元の画像に似た画像を生成させます。生成された画像は見た目が似ているだけでなく、同様のスタイルも保持されています。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-compare.png"
+    alt="Flux Redux"
+  />
+</Frame>
+
+この機能は、元の画像に似ているが、いくつかの違いがある画像を生成するのに適しています。Fluxの Redux モデルを使用する方法を見てみましょう。
+
+## 1. Flux Redux モデルのダウンロード
+
+まず、Flux Redux モデルをダウンロードする必要があります。[ここ](https://huggingface.co/black-forest-labs/FLUX.1-Redux-dev/tree/main) から Flux Redux dev モデルをダウンロードし、`/models/style_models` ディレクトリに配置します。style_models ディレクトリであることに注意してください。diffusion_models ディレクトリではありません。
+
+さらに、`sigclip_vision_patch14_384` というモデルをダウンロードする必要があります。このモデルは Flux が画像を Conditioning に変換するために使用されます。[ここ](https://huggingface.co/Comfy-Org/sigclip_vision_384/blob/main/sigclip_vision_patch14_384.safetensors) からこのモデルをダウンロードし、`/models/clip_vision` ディレクトリに配置します。
+
+## 2. Flux Redux 基本ワークフロー
+
+### 2.1 単一画像の変化
+
+モデルをダウンロードしたら、Flux Redux ComfyUI ワークフローを構築します。まず、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow) で完全な Flux ワークフローをロードし、それをベースにして修正します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+
+最も大きな変更点は、追加の Flux Redux ノードグループがあることです。このノードグループは画像を Conditioning に変換し、それを Flux モデルに入力します。
+
+このノードグループは初めて見ると複雑に感じるかもしれませんが、説明を聞くとすぐにこのノードグループの設定方法を覚えることができます。まず、Redux の能力はモデルが入力画像に似た画像を生成することです。そのため、最も重要なノードは `Apply Style Model` ノード (図 ①) です。そして、このノードの出力は Conditioning であるため、BasicGuider ノードに接続する必要があります。
+
+そして、`Apply Style Model` ノードには以下の入力ノードがあります：
+
+1. Conditioning: 前述したように、Redux は Prompt と画像を Conditioning に入力するため、この Conditioning は CLIP ベースの FluxGuidance ノードに接続する必要があります。
+2. Style Model: これは Flux Redux モデルに接続するためです。空白部分をダブルクリックし、`Load Style Model` ノード (図 ②) を検索し、ワークフローに追加し、それを `Apply Style Model` ノードに接続し、前述した Flux Redux モデルを選択します。
+3. Clip_vision_output: `Clip Vision Encode` ノード (図 ③) を検索し、ワークフローに追加し、それを `Load CLIP Vision` ノード (図 ④) と `Load Image` ノード (図 ⑤) に接続します。
+
+<Note>
+ここで、図 ③ の `Clip Vision Encode` ノードには追加の `crop` パラメータがあることに注意してください。これは何を意味しますか？これは画像をトリミングし、そのトリミングされた画像のみをエンコードします。`Center` を選択すると、画像の中央部分をトリミングすることを意味します。なぜトリミングが必要なのですか？Redux モデルは正方形の画像しか受け入れられないためです。そのため、入力画像は正方形である必要があります。そうしないと、生成された画像に画像のすべての要素が含まれない可能性があります。
+</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-workflow.jpeg"
+    alt="Flux Redux"
+  />
+</Frame>
+
+ここで、図 ③ の `Clip Vision Encode` ノードには追加の `crop` パラメータがあることに注意してください。これは何を意味しますか？これは画像をトリミングし、そのトリミングされた画像のみをエンコードします。`Center` を選択すると、画像の中央部分をトリミングすることを意味します。なぜトリミングが必要なのですか？Redux モデルは正方形の画像しか受け入れられないためです。そのため、入力画像は正方形である必要があります。そうしないと、生成された画像に画像のすべての要素が含まれない可能性があります。
+
+このプロセスを簡単に理解すると、Flux Redux モデルを翻訳機能として使用することができます。画像内の様々な要素を Conditioning データに変換し、それを Flux モデルに入力して画像を生成します。
+
+### 2.2 2 つの画像の融合
+
+単一の画像を使用して変化を生成するだけでなく、Redux モデルを使用して 2 つの画像を融合することもできます。上記のワークフローに基づいて、`Batch Images` ノード (図 ①) を追加し、それを 2 番目の `Load Image` ノード (図 ②) に接続するだけです。
+
+そして、融合したい 2 つの画像を選択します。例えば、ソファと森の画像を融合して、とても興味深い画像が生成されます。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-batch-images-workflow.jpeg"
+    alt="Flux Redux Batch Image"
+  />
+</Frame>
+
+## 3. Flux Redux の重みを減らす
+
+上記のワークフローを使用すると、Prompt の重みが非常に低く、Prompt を介して画像の内容やスタイルを変更することができないことがあります。その理由は何でしょうか？
+
+前述したように、Flux Redux モデルは翻訳機能です。画像内の様々な要素を Flux が理解できる Conditioning データに変換し、それを Flux モデルに入力して画像を生成します。これらの翻訳データは、あなたの Prompt に追加されます。
+
+しかし、通常、あなたの Prompt は非常に短く、通常 255 または 512 トークンです。対照的に、Redux の Prompt は 729 トークンです。これは、元の Prompt の長さの約 3 倍です。
+
+そのため、Prompt を介して画像の内容やスタイルをより制御したい場合は、どうすればよいでしょうか？2 つの方法があります：
+
+1. Redux の重みを減らす、または Redux Prompt の長さを短くする。
+2. Text の重みを増加させる、または Prompt の長さを増加させる。
+
+どちらの方法もそれぞれの利点と欠点があり、結果は通常入力画像に依存するため、必要に応じて両方を試してみることができます。
+
+### 3.1 プラグインを使用して Redux の重みを減らす
+
+まず、1 つ目の方法について説明します。この問題を解決するために、オープンソースの開発者がこの [プラグイン](https://github.com/kaibioinfo/ComfyUI_AdvancedRefluxControl) を開発しました。このプラグインを使用すると、Redux モデルをより制御することができます。
+
+このプラグインは ComfyUI Manager を介してインストールするか、Git Clone を介してインストールすることができます。詳細なインストール方法は、[ComfyUI プラグインのインストール](https://comflowy.com/advanced/how-to-install-comfyui-extension) の記事を参照してください。
+
+プラグインをインストールした後、ワークフロー内の Redux ノードグループを変更するだけです：
+
+1. `Apply Style Model` ノードを削除し、図 ① の `Redux Advanced` ノードに置き換えます。
+2. テキストプロンプトを変更します。
+3. 最後に、入力画像に似た画像が生成されますが、テキストプロンプトによって内容が制御されます。例えば、レゴスタイルのバスケットボールシューズをレゴスタイルのランニングシューズに変換しました。
+
+いくつかの注意点：
+1. 図 ① の `Redux Advanced` ノードの `downsampling_factor` パラメータを調整する必要があります。値が大きいほど、Image Prompt の重みが低くなります。3 はおおよそ中程度の強度です。状況に応じて異なる値の効果をテストできます。
+2. `downsampling_factor` パラメータを調整するだけでなく、`downsampling_function` パラメータを調整することもできます。異なるパラメータを切り替えて試してみることができます。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-plugin.png"
+    alt="Flux Redux Plugin"
+  />
+</Frame>
+
+このプラグインは、この使用方法に加えて、マスクを使用して希望する要素を円形にすることもできます。例えば、この場合、レゴスタイルを保持するだけで、シューズ自体は保持する必要がありません。その場合、`Load Image` ノードの `Mask` 端子を `Redux Advanced` ノードの `Mask` 端子に接続し、いくつかの領域を円形にするだけです：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-plugin-mask.png"
+    alt="Flux Redux Plugin Mask"
+  />
+</Frame>
+
+### 3.2 Text Prompt の重みを増加させる
+
+次に、2 つ目の方法について説明します。Text の重みを増加させる、または Prompt の長さを増加させることで、Prompt の重みを増加させることができます。ワークフローは以下の通りです：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-text-weight-workflow.png"
+    alt="Flux Redux Text Weight Workflow"
+  />
+</Frame>
+
+ワークフローに図 ① と ② のノードを追加しました。Strength を調整し、Text Prompt の重みを増加させ、Redux の重みを減らしました。全体的に、効果は平均です。Text Prompt の重みが増加したにもかかわらず、生成された画像は確かにランニングシューズですが、スタイルはレゴスタイルを保持していません。
+
+そこで、別のアイデアに切り替えました。まず、Text Prompt をモデルに渡し、その後、Redux 処理データをモデルに渡します。これにより、生成された画像はまず Text Prompt の内容を含み、その後、Redux のデータに従って調整されます。これにより、Text Prompt の重みが保証されます。
+
+ワークフローの変更は比較的簡単です。Redux ノードグループを変更するだけです：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">図</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>`ConditioningSetTimestepRange` ノードを追加し、より区別しやすくするために `Prompt Conditioning` と名付けました。それを `FluxGuidance` ノードに接続し、開始値を 0、終了値を 0.1 に設定します。これは、最終生成過程で Text Prompt の割合が 10% に達することを意味します。Prompt の重みをより高くしたい場合は、終了値をより大きく設定します。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>もう 1 つ `ConditioningSetTimestepRange` ノードを追加し、より区別しやすくするために `Image Conditioning` と名付けました。それを `Apply Style Model` ノードに接続し、開始値を 0.1、終了値を 1 に設定します。これは、最終生成過程で Image Conditioning の割合が 90% に達することを意味します。ここで、開始値は Prompt Conditioning の終了値よりも大きくなければなりません。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>`Conditioning Combine` ノードを追加し、それを `Prompt Conditioning` ノードと `Image Conditioning` ノードに接続します。`Prompt Conditioning` が最初の入力であることに注意してください。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>そして、Text Prompt に「running shoes」を入力しました。</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>生成された画像は主にランニングシューズですが、スタイルは入力画像のレゴスタイルです。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Note>
+  最終的に生成された画像があなたの要件を満たすかどうかは、`Prompt Conditioning` と `Image Conditioning` の割合をどのように割り当てるかに依存します。要件に応じて調整してください。
+</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-text-weight.png"
+    alt="Flux Redux Text Weight"
+  />
+</Frame>

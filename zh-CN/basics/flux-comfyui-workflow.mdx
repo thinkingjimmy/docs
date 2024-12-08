@@ -1,0 +1,269 @@
+---
+title: Flux ComfyUI 工作流
+description: ''
+icon: 'object-group'
+---
+
+<Frame caption="此图片由 AI 生成">
+  <img
+    className="block dark:hidden rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/lettermark-of-flux-with-leaf-light.png"
+    alt="Flux Lettermark"
+  />
+  <img
+    className="hidden dark:block rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/lettermark-of-flux-with-leaf-dark.png"
+    alt="Flux Lettermark Dark"
+  />
+</Frame>
+
+<Note>本章主要介绍如何在 ComfyUI 中使用 Flux 模型。如果你对 ComfyUI 还不熟悉，可以先阅读 [ComfyUI 101](https://www.comflowy.com/docs) 教程。</Note>
+
+目前在 ComfyUI 上使用 Flux 有四种方法:
+
+1. **完整版本的 Flux**：这个版本的 Flux 模型文件不包含 Text Encoder 和 VAE 模型，所以还需要额外下载其他模型。并且这种方式适合大于 24GB 显存，以及内存大于 32GB的用户使用。但使用这个方式，能获得最好的成像质量。
+2. **ComfyUI 官方支持的 FP8 版本 Flux**：这个版本的 Flux 模型文件包含了 Text Encoder 和 VAE 模型，所以可以直接在 Checkpoint 中使用。并且适合小于 24GB 显存的用户使用。但这个版本的 Flux 的成像质量会比完整版本要差。
+3. **GGUF 版本**：这个版本是由开源社区开发者贡献，也是为了能在小显存设备上使用 Flux 模型，所以开发者将 Flux 模型转换为 GGUF 格式。但在精度上不会像 FP8 那样损失太多。不过这种方法，需要安装额外的插件。
+4. **NF4 版本**：这个版本与 GGUF 类似，也是为了能在小显存设备上使用 Flux 模型。但根据我的实验， NF4 在图像质量方面是最不可预测的版本。有时，图像非常好，而其他时候则很差。我觉得它存在一致性问题，所以我不太推荐使用。
+
+各位可以根据自己需求，选择合适的方式。如果你仅仅想体验 Flux 模型，那么 FP8 版本是一个不错的选择，只需要下载一个模型就能使用。如果你的电脑性能比较好，我建议你使用完整版本。
+
+如果你的电脑配置不足，又想使用完整的 Flux 模型，可以考虑使用 [Comflowy](https://www.comflowy.com) 。这是由我们开发的 ComfyUI 云端版本，使用的是高性能云端 GPU。
+
+## 1. 完整版本 Flux
+### 1.1 下载 Flux 模型
+
+首先你需要下载必要的模型到本地。首先，第一步是下载 Flux 模型。你可以去到 HuggingFace 下载 [FLUX.1-dev](https://huggingface.co/black-forest-labs/FLUX.1-dev) 或者 [FLUX.1-schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell) 模型。
+
+进入到 [FLUX.1-dev](https://huggingface.co/black-forest-labs/FLUX.1-dev) 页面，点击 `Files and versions` 按钮（图中①），然后点击 `Download` 按钮（图中②），下载模型。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/huggingface.png"
+    alt="Flux Model on HuggingFace"
+  />
+</Frame>
+
+下载好的模型，需要放到 ComfyUI 的 `/models/diffusion_models/` 目录下。
+
+### 1.2 下载 Text Encoder 模型
+
+接着还需要下载 Text Encoder 模型。正如我在前一章节介绍的那样，Flux 使用了两个 Text Encoder 模型。你需要去到[这里](https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main)下载两个模型，一个是 `clip_l.safetensors` ，另一个是 `t5xxl_fp16.safetensors`：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/huggingface-text-encoder.png"
+    alt="Flux Text Encoder on HuggingFace"
+  />
+</Frame>
+
+如果你的电脑的内存小于 32GB，那么你可以下载 `t5xxl_fp8_e4m3fn.safetensors` 模型。下载好的模型需要放在 ComfyUI 的 `/models/clip/` 目录下。
+
+### 1.3 下载 VAE 模型
+
+最后是下载 VAE 模型，可以去到[这里](https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors)下载模型。下载好的模型需要放在 ComfyUI 的 `/models/vae/` 目录下。
+
+### 1.4 配置 ComfyUI 工作流
+
+#### 1.4.1 ComfyUI 官方推荐版本
+
+下载好模型后，就可以进入到工作流的搭建了。
+
+首先介绍下 ComfyUI 官方推荐的 Flux 的完整版本工作流，你可以参考以下截图自行连接节点，手动连接将有助于你理解完整的工作流。
+
+亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的工作流，亦或者下载此工作流模板，并导入使用。（另外，如果你不知道如何使用 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-workflow.png"
+    alt="ComfyUI Flux Full Workflow"
+  />
+</Frame>
+
+我来简单介绍下这个工作流。你可以看到这个工作流与 ComfyUI 的默认 Stable Diffusion 工作流有很大的差异。我来详细解释下：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">图示</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>Load Diffusion Model 节点，用于加载 Flux 模型。因为 Black Forest Labs 提供的 Flux 模型没有包含 Text Encoder 和 VAE 模型。所以只能用这个节点来加载模型，而没有用 Load Checkpoint 节点。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>ModelSamplingFlux 节点里的基线偏移（base shift）是一种微小而稳定的调整，可以稳定图像生成过程，而最大偏移（max shift）是潜向量的最大允许变化，可以防止输出出现极端偏差。两者结合，可在图像生成的稳定性和灵活性之间取得平衡。<br/><br/>
+      如果增加基线偏移，生成的图像可能会变得更加一致，更接近预期的形式。但也可能失去一些细微的细节。减小基线偏移可以带来更多变化，从而呈现出更精细的细节或更微妙的纹理。不过，这也可能会使图像的稳定性稍差，可能会出现细微的伪影或不一致。<br/><br/>
+      增加最大偏移量，模型可以更自由地探索潜在空间，从而有可能对图片内容做出更有创意或更夸张的诠释。最终生成的图片可能会有更夸张的特征或更风格化的外观，但也有可能过于偏离真实的表现。降低最大偏移量会对模型造成限制，从而使对图片的描绘更加可控和逼真。图像可能会保持接近典型的外观，减少意外的变化，但可能会缺少一些创意元素或微妙的独特性。<br/><br/>
+      如果你想让 FLux 模型生成的图片更真实，可以试试将最大偏移调整为 0.5，基线偏移调整为 0.3。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>DualClipLoader 节点是用于加载 Text Encoder 模型的节点。正如我在前一章提到的那样，Flux 使用了两个 Text Encoder 模型，所以需要用这个节点来加载两个模型。一个是 `clip_l.safetensors`，另一个是 `t5xxl_fp16.safetensors`。Type 选择 `flux` 即可。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>与 DualClipLoader 节点相连的是 CLIP Text Encoder 节点。这个跟你在 Stable Diffusion 工作流中使用的 CLIP Text Encoder 节点是一样的。但这里有点不一样，这里并没有 Negative Prompt 节点。正如我前一章提到的那样，Flux 模型是一个引导蒸馏（guidance distilled）模型。所以没有 Negative Prompt。</td>
+    </tr>
+    <tr>
+      <td>⑤</td>
+      <td>Guidance 节点你可以设置 Guidance 值，可以设置从 0 到 100。这个值的影响非常微妙。需要根据不同的 Prompt 进行测试。如果你发现你生成的图片效果不好，可以尝试对其微调。经过测试: <br/><br/>1. 即使这个值设置得很大，比如 90，生成的图片依然是可用的。所以你可以放心去尝试。<br/><br/>
+      2. 这个值，只在特定的数值下有显著的效果，比如 1，生成的图片会比较阴暗。<br/><br/>
+      3. 0~4 之间效果变化会比较大。换句话来说，将此值从 0 设置为 4，生成图片，对比起来差异远大于将其从 10 设置到 60。所以如果你想要测试更多效果，你仅需要测试从 0 到 4 即可。<br/><br/>
+      4. 如果你想要生成的东西，非常复杂，且现实世界不存在，比如“有腿的西红柿”，那么你需要设置一个较大的值，比如 5 以上。<br/><br/>
+      5. 如果你不知道该用什么，将其设置为 3.5 就可以了。</td>
+    </tr>
+    <tr>
+      <td>⑥</td>
+      <td>EmptySD3LatentImage 节点，用于生成潜向量。虽然它名字是 SD3，但实际 Flux 也能用。</td>
+    </tr>
+    <tr>
+      <td>⑦</td>
+      <td>VAEDecode 节点，用于解码潜向量。这里要用到我们下载好的 VAE 模型。</td>
+    </tr>
+  </tbody>
+</table>
+
+#### 1.4.2 我推荐的版本
+
+ComfyUI 官方的版本我认为有点复杂，所以我推荐一个简化版本。这个版本仅需要使用到 Stable Diffusion 里常用的 KSampler 节点，去掉了 ModelSamplingFlux 节点，这样仅需要在 SD3LatentImage 里设置宽高。整体来看，这个版本更简单，也更容易理解。
+
+另外需要注意：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">图示</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>因为 Flux 里没有 Negative Prompt，所以你可以将 Negative Prompt 节点折叠起来。</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>因为 Flux 是一个引导蒸馏（guidance distilled）模型，所以 CFG 值并不会生效，需要将其设置为 1。</td>
+    </tr>
+  </tbody>
+</table>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-full-sug-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+
+## 2. FP8 版本 Flux
+
+### 2.1 下载 Flux Checkpoint 模型
+
+你可以点击[这里](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors)下载 Flux Dev FP8 Checkpoint 模型。下载好的模型需要放到 ComfyUI 的 `/models/checkpoints/ ` 目录下。
+
+### 2.2 配置 ComfyUI 工作流
+
+使用 FP8 版本 Flux 的工作流，可以参考以下截图自行连接节点，亦或者去到 [Comflowy]() 下载此工作流，并导入使用。
+
+这个版本，其实是我上面推荐的版本的更加简化的版本，将 Diffusion Model、DualCLIPLoader 和 VAE 节点替换为 Checkpoint Loader 节点。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-fp8-workflow.jpeg"
+    alt="ComfyUI Flux FP8 Workflow"
+  />
+</Frame>
+
+这个版本的工作流，与 Stable Diffusion 的工作流基本一致。有几个变化需要注意：
+
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">图示</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>①</td>
+      <td>Negative Prompt 节点不再生效，所以你可以将其折叠起来</td>
+    </tr>
+    <tr>
+      <td>②</td>
+      <td>增加了 Guidance 节点。你可以设置 Guidance 值，可以设置从 0 到 100。这个值的影响非常微妙。需要根据不同的 Prompt 进行测试。如果你发现你生成的图片效果不好，可以尝试对其微调。经过测试: <br/><br/>1. 即使这个值设置得很大，比如 90，生成的图片依然是可用的。所以你可以放心去尝试。<br/><br/>
+      2. 这个值，只在特定的数值下有显著的效果，比如 1，生成的图片会比较阴暗。<br/><br/>
+      3. 0~4 之间效果变化会比较大。换句话来说，将此值从 0 设置为 4，生成图片，对比起来差异远大于将其从 10 设置到 60。所以如果你想要测试更多效果，你仅需要测试从 0 到 4 即可。<br/><br/>
+      4. 如果你想要生成的东西，非常复杂，且现实世界不存在，比如“有腿的西红柿”，那么你需要设置一个较大的值，比如 5 以上。<br/><br/>
+      5. 如果你不知道该用什么，将其设置为 3.5 就可以了。</td>
+    </tr>
+    <tr>
+      <td>③</td>
+      <td>EmptySD3LatentImage 节点，用于生成潜向量。虽然它名字是 SD3，但实际 Flux 也能用。</td>
+    </tr>
+    <tr>
+      <td>④</td>
+      <td>KSampler 里的 CFG 配置正如我前一章节提到的那样，Flux 模型是一个引导蒸馏（guidance distilled）模型。CFG 值并不会生效，所以你需要将其设置为 1。</td>
+    </tr>
+  </tbody>
+</table>
+
+## 3. GGUF 版本 Flux
+
+### 3.1 下载 GGUF 版本 Flux 模型
+
+你可以点击[这里](https://huggingface.co/city96/FLUX.1-dev-gguf/tree/main)下载 GGUF 版本 Flux 模型。下载好的模型需要放到 ComfyUI 的 `/models/unet` 目录下。
+
+你会看到 GGUF 有很多版本，你可以根据你的电脑配置选择适合你的版本：
+
+<table>
+  <thead>
+    <tr>
+      <th width="5%">版本</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Q8_0</td>
+      <td>如果你有 24GB 的显存，使用 Q8 版本，它的出图效果几乎和 FP16 完全一样。与其他 CLIP 模型一起使用的话，你将使用大约 15GB 的显存。这样你就有更多的显存空间可以加载多个 LoRA，或者图片修复等模型。你甚至可以在使用 Q8 时与 Flux 加载一个LLM。</td>
+    </tr>
+    <tr>
+      <td>Q6_K</td>
+      <td>如果你只有 16GB 的显存，那么 Q6_K 非常适合你。和 CLIP 配合使用大约会占用 12GB 的显存。它在较小的体积下也提供了一定的准确性。</td>
+    </tr>
+    <tr>
+      <td>Q4_0 或 Q4_1</td>
+      <td>如果你只有少于 10GB 的显存，请使用 Q4_0 或 Q4_1，而不是 NF4（个人认为 NF4 在图像质量方面是最不可预测的版本。有时，图像非常好，而其他时候则很差。我觉得这个型号存在一致性问题）。我并不是说 NF4 不好。但如果你在寻找更接近 FP16 的模型，那么 Q4_0 就是你想要的。</td>
+    </tr>
+  </tbody>
+</table>
+
+### 3.2 配置 ComfyUI 工作流
+
+首先，你需要安装 [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) 插件，安装方法我这里不再赘述，你可以参考 [ComfyUI 插件安装教程](https://www.comflowy.com/advanced/how-to-install-comfyui-extension)。
+
+安装好插件后，你可以根据以下截图，自行连接节点。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+
+如果你细看这个工作流，你会发现它与 FP8 版本的工作流，非常像，只是将 Checkpoint Loader 节点，替换为 GGUF Loader 节点（图中①）。同时因为 GGUF 模型没有包含 Text Encoder 和 VAE 模型，所以需要用另外的 DualCLIPLoader （图中②）节点和 VAE 节点（图中③）：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-comfyui-workflow/comfyui-flux-gguf-workflow.jpeg"
+    alt="ComfyUI Flux GGUF Workflow"
+  />
+</Frame>
+
+另外，如果你的显存还是不够，你还可以下载对应的 GGUF 版本的 Text Encoder 模型，然后将 DualCLIPLoader 节点，替换为 DualCLIPLoader（GGUF） 节点，并加载下载好的 Text Encoder 模型。这样还能进一步地降低显存占用。
