@@ -94,15 +94,19 @@ Flux のプロンプトは非常に賢いですが、プロンプトを整理す
 
 ## 4. Prompt アシスタントプラグイン
 
-最後に、プロンプトアシスタントプラグイン [Bilbox ComfyUI](https://github.com/syllebra/bilbox-comfyui) をお勧めします。このプラグインは、プロンプトを整理するのに役立ちます。
+最後に、いくつかのプロンプトアシスタント拡張機能をお勧めします。
 
-このプラグインは ComfyUI Manager を通じてインストールするか、Git Clone を通じてインストールできます。詳細なインストール方法については、[ComfyUI 拡張機能のインストール](https://comflowy.com/advanced/how-to-install-comfyui-extension) を参照してください。
+### 4.1 Bilbox ComfyUI
+
+最初のプラグインは [Bilbox ComfyUI](https://github.com/syllebra/bilbox-comfyui) です。このプラグインは、プロンプトをより適切に整理するのに役立ちます。
+
+ComfyUI マネージャーまたは Git Clone を通じてこのプラグインをインストールできます。詳細なインストール方法については、[ComfyUI 拡張機能のインストール](https://comflowy.com/advanced/how-to-install-comfyui-extension)を参照してください。
 
 <Note>
-  このプラグインは写真のような画像に適しています。
+  このプラグインは、写真のようなイメージのプロンプトを作成するのに適していることに注意してください。
 </Note>
 
-使用方法は非常に簡単です。まず、`BilboX` ノード（図の②）を `CLIP Text Encode` ノード（図の①）の前に挿入し、`CLIP Text Encode` ノードの `text` 端子に接続します。次に、プラグインのプロンプトに従って、必要なプロンプトを入力または選択します。例えば、以下の図では、街頭写真を選択し、いくつかの照明オプションを追加しました。生成された画像は非常に完璧です：
+使用方法は非常に簡単です。まず、`CLIP Text Encode` ノード（図の①）の前に `BilboX` ノード（図の②）を挿入し、`CLIP Text Encode` ノードの `text` 端子に接続します。次に、プラグインのプロンプトに従って、必要なプロンプトを入力または選択します。例えば、以下の図では、ストリートフォトグラフィーを選択し、いくつかの光のオプションを追加しました。生成された画像は非常に完璧です：
 
 <Frame>
   <img
@@ -112,12 +116,38 @@ Flux のプロンプトは非常に賢いですが、プロンプトを整理す
   />
 </Frame>
 
-また、誰かが `CLIP Text Encode` ノードの `text` 端子を表示する方法を知らないかもしれません。実際には非常に簡単です。`CLIP Text Encode` ノード（図の①）を右クリックし、`Convert Widget to Input`（図の②）を選択し、次に `Convert text to input`（図の③）を選択します。
+また、`CLIP Text Encode` ノードの `text` 端子を表示する方法がわからない場合は、`CLIP Text Encode` ノード（図の①）を右クリックし、`Convert Widget to Input`（図の②）を選択し、`Convert text to input`（図の③）を選択します。
 
 <Frame>
   <img
     className="rounded-xl"
     src="/images/basics/flux-prompt/flux-bilbox-show-inputs.png"
     alt="Flux Bilbox Show Inputs"
+  />
+</Frame>
+
+### 4.2 Flux Prompt Generator
+
+最初のプラグインは写真のようなプロンプトを生成するのに適していますが、2番目のプラグインはより完全な Flux プロンプトを生成できる [Flux Prompt Generator](https://github.com/fairy-root/Flux-Prompt-Generator) です。
+
+プラグインをインストールしたら、ワークフローに追加し、最初のプラグインよりもオプションが多いことがわかります：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-prompt/flux-prompt-generator.png"
+    alt="Flux Prompt Generator"
+  />
+</Frame>
+
+### 4.3 ComfyUI Portrait Master
+
+最後のプラグインは [ComfyUI Portrait Master](https://github.com/florestefano1975/comfyui-portrait-master) です。このプラグインは、フェイスの詳細に関する設定が多く、ポートレートシーンに適したプロンプトを作成するのに役立ちます。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-prompt/flux-portrait-master.png"
+    alt="Flux Portrait Master"
   />
 </Frame>
