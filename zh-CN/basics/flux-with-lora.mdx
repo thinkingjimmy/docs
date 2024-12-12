@@ -45,7 +45,7 @@ icon: 'palette'
 
 ## 2. FLux LoRA 工作流
 
-下载好模型后，我们来搭建 Flux LoRA 的 ComfyUI 工作流。首先，你可以加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中我推荐的完整版 Flux 工作流，然后基于这个工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+下载好模型后，我们来搭建 Flux LoRA 的 ComfyUI 工作流。首先，你可以加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中我推荐的完整版 Flux 工作流，然后基于这个工作流进行修改。
 
 改动比较少，你只需要添加一个 `LoraLoaderModelOnly` 节点（图中①）即可，注意是 `LoraLoaderModelOnly` 而不是 `LoraLoader`。因为我们只需要加载 LoRA 模型，不需要 Clip模型。
 
@@ -58,6 +58,17 @@ icon: 'palette'
     alt="Flux Single LoRA Workflow"
   />
 </Frame>
+
+如果你不想手动连接，可以去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-workflow-db9bd4) 直接使用我们的 Flux Dev LoRA 应用，使用此应用，生成单张图片只需要 8s 左右。亦或者下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<CardGroup cols={2}>
+  <Card title="Flux Dev App" icon="rocket" href="https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831" horizontal>
+    使用此应用，生成单张图片只需要 8s 左右。
+  </Card>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/237ab1cb-ed83-4207-9bc9-4097f5a6e6c8" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 
 ## 3. 串联多个 LoRA 模型

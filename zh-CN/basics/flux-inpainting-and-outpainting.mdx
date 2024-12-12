@@ -36,7 +36,13 @@ icon: 'paintbrush'
 
 首先，我们先来说下，如何不改变其他地方，只改变某一区域。
 
-下载好模型后，你可以根据以下截图，连接节点。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+下载好模型后，你可以根据以下截图，连接节点。如果你不想手动连接，你可以下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<CardGroup cols={1}>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/ee13a0d4-4684-41b5-851f-498d50f614ef" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 整个工作流跟 Stable Diffusion 的 Inpainting 工作流很像。也都是将图片转为 Conditioning 将 Prompt 和图片一起输入到 KSampler 节点中。
 
@@ -76,7 +82,13 @@ Flux Fill 模型除了可以修改图片的某一部分，还可以将图片的�
   />
 </Frame>
 
-你可以通过调整 Inpainting 工作流来搭建 Outpainting 工作流。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+你可以通过调整 Inpainting 工作流来搭建 Outpainting 工作流。如果你不想手动连接，你可以下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<CardGroup cols={1}>
+  <Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/c538dbac-4d92-4051-9240-8db0d76eca3a" horizontal>
+    点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+  </Card>
+</CardGroup>
 
 首先你需要添加一个 Pad Image for Outpainting 节点（图中①），然后将其和 Load Image 和 InpaintModelConditioning 节点相连。然后你还需要在 Pad Image for Outpainting 节点中设置你想要扩展的区域，比如我想将图片的右边拓展 104 像素，下边拓展 504 像素。如果你想拓展顶部和左侧，则还需要设置 Top 和 Left 的值。设置好后，在图示中的 ② 中加载你需要拓展的图片。然后记得输入 Prompt，我的 Prompt 是 `An orange-haired girl with a bikini on top and jeans on bottom. Blue sky background`。然后点击 Generate 按钮，生成图片。
 

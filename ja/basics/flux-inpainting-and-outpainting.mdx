@@ -36,7 +36,13 @@ Flux Fill モデルを使用する必要があります。[ここ](https://huggi
 
 まず、特定の領域のみを修正して、他の部分に影響を与えない方法について説明します。
 
-モデルをダウンロードしたら、以下のスクリーンショットに従ってノードを接続します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードして使用します。
+モデルをダウンロードした後、以下のスクリーンショットに従ってノードを接続します。手動で接続したくない場合は、このワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートできます。（Comflowy テンプレートのダウンロード方法がわからない場合は、こちらの[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)を参照してください）
+
+<CardGroup cols={1}>
+  <Card title="Flux ComfyUI テンプレート" icon="cloud-arrow-down" href="https://app.comflowy.com/app/ee13a0d4-4684-41b5-851f-498d50f614ef" horizontal>
+    右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+  </Card>
+</CardGroup>
 
 このワークフローは Stable Diffusion 画像修正ワークフローと非常に似ています。両方とも画像を Conditioning に変換し、その後 Prompt と画像を KSampler ノードに入力します。
 
@@ -76,7 +82,13 @@ Flux Fill モデルは画像の一部を修正するだけでなく、画像の�
   />
 </Frame>
 
-画像修正ワークフローを調整して、画像拡大ワークフローを構築できます。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードして使用します。
+Inpainting のワークフローを調整して、Outpainting のワークフローを構築できます。手動で接続したくない場合は、このワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートできます。（Comflowy テンプレートのダウンロード方法がわからない場合は、こちらの[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)を参照してください）
+
+<CardGroup cols={1}>
+  <Card title="Flux ComfyUI テンプレート" icon="cloud-arrow-down" href="https://app.comflowy.com/app/c538dbac-4d92-4051-9240-8db0d76eca3a" horizontal>
+    右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+  </Card>
+</CardGroup>
 
 まず、画像拡大のための Pad Image ノード (①) を追加し、それを Load Image ノードと InpaintModelConditioning ノードに接続します。その後、画像拡大したい領域を Pad Image for Outpainting ノードに設定します。例えば、画像の右側を 104 ピクセル、下側を 504 ピクセル拡大したい場合は、右側と下側の値を設定します。設定したら、拡大したい画像を ② にロードします。そして、プロンプトを入力します。私のプロンプトは `An orange-haired girl with a bikini on top and jeans on bottom. Blue sky background` です。そして、生成ボタンをクリックして画像を生成します。
 

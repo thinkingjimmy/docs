@@ -36,7 +36,13 @@ We need to use the Flux fill model. You need to go to [here](https://huggingface
 
 First, let's talk about how to modify only a specific area without affecting other parts.
 
-After downloading the model, you can connect the nodes according to the following screenshot. Or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) to download this workflow and use it.
+After downloading the model, you can connect the nodes according to the following screenshot. If you don't want to manually connect, you can download this workflow template and import it into your local ComfyUI. (Additionally, if you don't know how to download a Comflowy template, you can refer to this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template))
+
+<CardGroup cols={1}>
+  <Card title="Flux ComfyUI Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/ee13a0d4-4684-41b5-851f-498d50f614ef" horizontal>
+    Click the Remix button in the top right corner to enter ComfyUI workflow mode.
+  </Card>
+</CardGroup>
 
 The workflow is very similar to the Stable Diffusion Inpainting workflow. Both convert images to Conditioning, and then input the Prompt and image together into the KSampler node.
 
@@ -76,7 +82,13 @@ Flux Fill model can not only modify a part of the image, but also expand a part 
   />
 </Frame>
 
-You can build the Outpainting workflow by adjusting the Inpainting workflow. Or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) to download this workflow and use it.
+You can build an Outpainting workflow by adjusting the Inpainting workflow. If you don't want to manually connect, you can download this workflow template and import it into your local ComfyUI. (Additionally, if you don't know how to download a Comflowy template, you can refer to this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template))
+
+<CardGroup cols={1}>
+  <Card title="Flux ComfyUI Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/c538dbac-4d92-4051-9240-8db0d76eca3a" horizontal>
+    Click the Remix button in the top right corner to enter ComfyUI workflow mode.
+  </Card>
+</CardGroup>
 
 First, you need to add a Pad Image for Outpainting node (①), then connect it to the Load Image and InpaintModelConditioning nodes. Then you need to set the area you want to expand in the Pad Image for Outpainting node. For example, I want to expand the right side of the image by 104 pixels and the bottom side by 504 pixels. If you want to expand the top and left sides, you also need to set the Top and Left values. After setting, load the image you want to expand in the ②. Then remember to input the Prompt, my Prompt is `An orange-haired girl with a bikini on top and jeans on bottom. Blue sky background`. Then click the Generate button to generate the image.
 
