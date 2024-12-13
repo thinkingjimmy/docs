@@ -1,7 +1,80 @@
 ---
-title: Flux PuLID（書き込み中）
-description: ''
+title: Flux PuLID
+description: 'Flux モデルと PuLID モデルを使用して、元の画像の人物の位置と一致する画像を生成する方法を紹介します。'
 icon: 'people-arrows'
+"og:image": 'https://image.app-image.com/flux101/flux-pulid-header-image.png'
+"twitter:image": 'https://image.app-image.com/flux101/flux-pulid-header-image.png'
 ---
 
-書き込み中...
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-header-image.png"
+    alt="Flux With PuLID Header Image"
+  />
+</Frame>
+
+多くの人にとって、次のようなニーズがあります：人物の写真をアップロードし、AIモデルがその写真に基づいて、元の画像の人物の位置と一致する画像を生成することを望んでいます。例えば、下の画像のように、アインシュタインの白黒写真をアップロードし、AIに鉄人（アイアンマン）の装甲を着たアインシュタインの画像を生成させます：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-compare.png"
+    alt="Flux PuLID"
+  />
+</Frame>
+
+このようなシナリオは、Stable Diffusion では InstantID または PuLID モデルを使用して実現できます。ただし、InstantID はまだ Flux バージョンがありません。そのため、現時点では PuLID モデルを使用する必要があります。
+
+## 1. Flux PuLID モデルのダウンロード
+
+まず、Flux PuLID モデルをダウンロードする必要があります。[ここ](https://huggingface.co/guozinan/PuLID/tree/main) から Flux PuLID モデルをダウンロードし、`/models/pulid` ディレクトリに配置します。
+
+さらに、`sigclip_vision_patch14_384` というモデルをダウンロードする必要があります。このモデルは Flux が画像を Conditioning に変換するために使用されます。[ここ](https://huggingface.co/Comfy-Org/sigclip_vision_384/blob/main/sigclip_vision_patch14_384.safetensors) からこのモデルをダウンロードし、`/models/clip_vision` ディレクトリに配置します。
+
+
+## 2. ComfyUI-PuLID-Flux-Enhanced プラグインのダウンロード
+
+完成模型ダウンロード後、[ComfyUI-PuLID-Flux-Enhanced](https://github.com/sipie800/ComfyUI-PuLID-Flux-Enhanced) プラグインをインストールする必要があります。ComfyUI の ComfyUI-Manager を使用してこのプラグインをインストールできます。詳細なインストール方法については、[ComfyUI プラグインのインストール](https://comflowy.com/advanced/how-to-install-comfyui-extension) を参照してください。
+
+## 3. Flux PuLID ワークフロー
+
+プラグインをインストールしたら、下図に示すように、Flux PuLID ワークフローを構築できます。
+
+手動接続が不要な場合は、[Comflowy](https://app.comflowy.com/app/fbb14965-b15e-4131-8a72-b91172d7a7a4) からこのワークフローをダウンロードし、ローカルの ComfyUI にインポートできます。（また、Comflowy テンプレートをダウンロードする方法がわからない場合は、[このチュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template) を参照してください）
+
+<Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/fbb14965-b15e-4131-8a72-b91172d7a7a4" horizontal>
+  右上隅の Remix ボタンをクリックして、ワークフローモードに入ります。
+</Card>
+
+このワークフローを見ると、実際には基礎的な Flux ワークフローに `Apply PuLID Flux` ノード（図中①）が追加されています。そして、① を続けて接続し、図中の ②、③、④、⑤ ノードを `Apply PuLID Flux` ノードに接続します。PuLID Flux の実装方法は Redux と似ています。つまり、画像を Clip で単語ベクトルに変換し、それらの単語ベクトルを PuLID モデルで Flux モデルが理解できるデータに翻訳し、最終的に Prompt とこれらの画像データを Flux モデルに渡します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-workflow.jpeg"
+    alt="Flux PuLID"
+  />
+</Frame>
+
+以上は最も基本的な使用方法です。以下にいくつかの小テクニックを紹介します。
+
+1. 単一の画像生成結果が不十分な場合は、複数の画像をインポートしてみてください。これを実現する方法は複数ありますが、最も簡単な方法は `Batch Images` ノード（図中①）を使用し、2 つの画像をインポートすることです。`Batch Images` ノードは `Apply PuLID Flux` ノードの `image` 端点（図中②）に接続され、最もモデルに参考にしてほしい画像を `Apply PuLID Flux` ノードの `prior_image` 端点（図中③）に接続する必要があります。
+
+2. 使用 v0.9.0 バージョンの PuLID モデルの場合、`Apply PuLID Flux` ノードの `weight` パラメータ（図中④）を 0.8-0.95 の間に設定する必要があります。v0.9.1 バージョンの場合、`weight` パラメータを 0.9-1.0 の間に設定する必要があります。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-multiple-image.png"
+    alt="Flux PuLID Multiple Image"
+  />
+</Frame>
+
+3. `Apply PuLID Flux` ノードの `fusion` パラメータを `max` または `max_token` に設定することで、顔の主要な特徴（例えば大きな目や特殊な鼻など）を強調することができます。ただし、これは保真度を超える可能性があり、失真を引き起こす可能性があります。
+
+4. 最後に、`use_gray` を使用すると、細部が失われる場合があります。これは実験によって調整できます。その他のパラメータは、ほとんどの場合、調整する必要はありません。
+
+5. Flux のモデルは完全版を使用することをお勧めします。また、fp16 または fp8 バージョンを使用することをお勧めします。gguf または nf4 バージョンは使用しないでください。
+
+6. 微調整されたモデルを使用したい場合は、LoRA を追加する方法を直接使用することをお勧めします。これは、生成結果がそれほど良くない可能性があるためです。ただし、これは絶対的ではありません。

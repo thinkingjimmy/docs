@@ -1,7 +1,78 @@
 ---
-title: Flux PuLID（撰写中）
-description: ''
+title: Flux PuLID
+description: '使用 Flux 模型和 PuLID 模型，生成一张与原图人物位置一致的图片'
 icon: 'people-arrows'
+"og:image": 'https://image.app-image.com/flux101/flux-pulid-header-image.png'
+"twitter:image": 'https://image.app-image.com/flux101/flux-pulid-header-image.png'
 ---
 
-撰写中...
+<Frame caption="本图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-header-image.png"
+    alt="Flux With PuLID Header Image"
+  />
+</Frame>
+
+可能对于大多数人来说，还有一种这样的需求：上传一张人物照片，然后希望 AI 模型能够根据这张照片，生成一张与原图人物位置一致的图片。比如像下图所示的那样，我上传了一张爱因斯坦的黑白照片，然后让 AI 生成一张爱因斯坦身穿钢铁侠盔甲的照片：
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-compare.png"
+    alt="Flux PuLID"
+  />
+</Frame>
+
+这种场景应该如何实现呢？在 Stable Diffusion 中，我们可能会用到 InstantID 或者 PuLID 这样的模型来实现。目前 InstantID 还没有 Flux 版本，所以暂时只能使用 PuLID 模型。
+
+## 1. 下载 Flux PuLID 模型
+
+你可以在[这里](https://huggingface.co/guozinan/PuLID/tree/main)下载 Flux PuLID 模型，并将其放在 `/models/pulid` 目录下。另外，模型作者会定期更新模型，一般情况下你仅需下载最新的即可。当然，你也可以下载旧版本，然后都尝试下。目前我测试下来，好像 0.9.1 版本并没有比 0.9.0 版本效果好特别多。
+
+## 2. 下载 ComfyUI-PuLID-Flux-Enhanced 插件
+
+完成模型下载后，你需要安装 [ComfyUI-PuLID-Flux-Enhanced](https://github.com/sipie800/ComfyUI-PuLID-Flux-Enhanced) 插件。你可以通过 ComfyUI 的 ComfyUI-Manager 安装此插件。详细的安装方式，可以参考[安装 ComfyUI 插件](https://comflowy.com/advanced/how-to-install-comfyui-extension)一文。
+
+## 3. Flux PuLID 工作流
+
+完成插件安装后，你可以根据下图所示，搭建一个 Flux PuLID 工作流。
+
+如果你不想手动连接，可以去 Comflowy 下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/fbb14965-b15e-4131-8a72-b91172d7a7a4" horizontal>
+  点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+</Card>
+
+
+如果你细看这个工作流，其实它就是在基础的 Flux 工作流上加了一个 `Apply PuLID Flux` 节点（图中①）。然后顺着 ① 继续连接，将图中的 ②、③、④、⑤节点连接到 `Apply PuLID Flux` 节点上。其实你可以看到，PuLID Flux 与 Redux 的实现方法有点类似，也是将一张图通过 Clip 转为一组词向量，然后再用 PuLID 模型将这些词向量翻译成 Flux 模型能理解的数据，最后将 Prompt 和这些图片数据一起传递给 Flux 模型。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-workflow.jpeg"
+    alt="Flux PuLID"
+  />
+</Frame>
+
+以上是最基础的使用方式，我再介绍几个小技巧：
+
+1. 如果单张图片生成效果不好，可以尝试导入多张图。有很多种方式可以实现这一点，最简单的应该是是使用 `Batch Images` 节点（图中①），然后导入两张图片。Batch Images 节点与 `Apply PuLID Flux` 节点里的 `image` 端点（图中②）相连，然后还要注意，你还需要将最希望模型参考的照片，连接到 `Apply PuLID Flux` 节点里的 `prior_image` 端点（图中③）上。
+
+2. 另外，如果你用使用的 v0.9.0 版本的 PuLID 模型，那么 `Apply PuLID Flux` 节点里的 `weight` 参数（图中④）需要设置为 0.8-0.95 之间。如果是 v0.9.1 版本，那么 `weight` 参数需要设置为 0.9-1.0 之间。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-pulid/flux-pulid-multiple-image.png"
+    alt="Flux PuLID Multiple Image"
+  />
+</Frame>
+
+3. `Apply PuLID Flux` 节点里的 `fusion` 你可以尝试设置为 `max` 或 `max_token`，这可以增强面部的一些主要特征（如大眼睛、特殊鼻子等）。不过，它可能会超出保真度而导致失真。
+
+4. 最后，在某些情况下，使用会 `use_gray` 会导致细节丢失，你可以根据自己的实验尝试关闭或开启它。其余参数，在大多数情况下，你都不需要进行调整。
+
+5. Flux 的模型最好使用完整版本，或者是 fp16 以及 fp8 版本，我不推荐 gguf 或 nf4 的版本。
+
+6. 如果你想要使用微调的模型，最好直接通过加 LoRA 的方式，而不是使用微调过的完整模型。因为有可能导致生成的效果没那么好，但这也不绝对，需要你测试。

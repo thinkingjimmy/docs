@@ -280,20 +280,16 @@
         "title": "Flux Apps",
         "links": [
           {
-            "label": "Careers",
-            "url": "https://mintlify.com/careers"
+            "label": "Flux Pro",
+            "url": "https://app.comflowy.com/app/153bbc35-b70e-494b-af5a-14eba0f794b9"
           },
           {
-            "label": "Blog",
-            "url": "https://mintlify.com/blog"
+            "label": "Flux Dev",
+            "url": "https://app.comflowy.com/app/28e42489-4c34-4c36-9825-f65ad32dd831"
           },
           {
-            "label": "Public Roadmap",
-            "url": "https://feedback.mintlify.com/roadmap"
-          },
-          {
-            "label": "Security",
-            "url": "https://mintlify.com/security/responsible-disclosure"
+            "label": "CharacterCraft",
+            "url": "https://app.comflowy.com/app/245299b2-4247-4e41-9736-92c6abd2953b"
           }
         ]
       }
