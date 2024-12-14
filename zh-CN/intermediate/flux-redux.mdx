@@ -40,7 +40,13 @@ icon: 'clone'
 
 ### 2.1 单图变体
 
-下载好模型后，我们来搭建 Flux Redux 的 ComfyUI 工作流。首先，你可以加载在 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中的完整版 Flux 工作流，然后基于这个工作流进行修改。亦或者去到 [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) 下载此工作流，并导入使用。
+下载好模型后，我们来搭建 Flux Redux 的 ComfyUI 工作流。
+
+如果你不想手动连接，可以去 Comflowy 下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/1e137ea1-e390-43a9-b90c-e7ab14a438b8" horizontal>
+  点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+</Card>
 
 最核心的变化其实就是多了一个 Flux Redux 节点组。通过这个节点组将图片转成 Conditioning，然后将其和 Prompt 一起输入到 Flux 模型中。
 
@@ -81,6 +87,12 @@ icon: 'clone'
     alt="Flux Redux Batch Image"
   />
 </Frame>
+
+如果你不想手动连接，可以去 Comflowy 下载此工作流模板，并导入到本地 ComfyUI 使用。（另外，如果你不知道如何下载 Comflowy 模板，可以参考此[教程](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)）
+
+<Card title="Flux ComfyUI 工作流模板" icon="cloud-arrow-down" href="https://app.comflowy.com/app/1eb99601-7d43-420f-8fbe-52e5be3e28c9" horizontal>
+  点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
+</Card>
 
 ## 3. 降低 Flux Redux 权重
 

@@ -1,7 +1,67 @@
 ---
-title: Flux IPA（撰写中）
-description: ''
+title: Flux IPA
+description: '本章节我们将介绍如何使用 Flux IPA 模型，它也可以像 Redux 类似，能帮助你生成一张与输入图类似的图片。但它与 Redux 最大的不同是它可以通过 Prompt 对图片进行微调。'
 icon: 'image'
+"og:image": 'https://image.app-image.com/flux101/flux-ipa-header-image.png'
+"twitter:image": 'https://image.app-image.com/flux101/flux-ipa-header-image.png'
 ---
 
-撰写中...
+<Frame caption="本图由 AI 生成">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-header-image.png"
+    alt="Flux IPA Header Image"
+  />
+</Frame>
+
+在前几章我们分享过 Flux Redux 模型，它可生成一张与输入图类似的图片。但它也有个缺点，输入图的权重太高，以至于无法通过 Prompt 进行微调。虽然可以通过插件对 Redux 模型的权重进行微调，但效果有的时候也并不理想。
+
+本章节我们将介绍如何使用 Flux IPA 模型，它也可以像 Redux 类似，能帮助你生成一张与输入图类似的图片。但它与 Redux 最大的不同是它可以通过 Prompt 对图片进行微调。效果类似下方所示。我上传一张蒙拉丽莎的图片，然后我在 prompt 里添加了 wearing sunglasses 或者是 wearing earphone 这样的词，然后使用 Flux IPA 模型生成两张图片。可以看到右边的两张图片，在风格和人物样貌上都相对比较像蒙拉丽莎，同时画面内又增加了太阳镜或者耳机。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-compare.png"
+    alt="Flux IPA"
+  />
+</Frame>
+
+## 1. 安装 Flux IPA 插件
+
+目前市面上有两款 Flux IPA 模型，一款是 Xlab 的 Flux IPA，另一款是 InstantX 的 Flux IPA。我推荐使用 InstantX 的 Flux IPA，因为经过我的测试，它对显存的要求没那么高，并且效果也还不错。
+
+使用 InstantX 的 Flux IPA 模型，你需要安装 [Flux IPA 插件](https://github.com/Shakker-Labs/ComfyUI-IPAdapter-Flux)。你可以通过 ComfyUI 的 ComfyUI-Manager 安装此插件。详细的安装方式，可以参考[安装 ComfyUI 插件](https://comflowy.com/advanced/how-to-install-comfyui-extension)一文。
+
+## 2. 下载 Flux IPA 模型
+
+完成插件安装后，你需要下载 Flux IPA 模型。你可以去到[这里](https://huggingface.co/InstantX/FLUX.1-dev-IP-Adapter/tree/main)下载 Flux IPA 模型，你仅需要下载 `ip-adapter.bin` 文件，并将其放在 `/models/ipadapter-flux` 目录下。
+
+## 3. Flux IPA 工作流
+
+完成模型下载后，你可以根据下图所示，搭建一个 Flux IPA 工作流。
+
+如果你细看这个工作流，其实它就是在基础的 Flux 工作流上加了一个 `Apply IPAdapter Flux Model` 节点（图中①）。然后顺着 ① 继续连接，将图中的 ②、③、④ 节点连接到 `Apply IPAdapter Flux Model` 节点上。
+
+这里需要注意，IPAdapter 模型与 Redux 不同，它并不会将数据与 Prompt 一起传递给 Flux 模型，而是将数据与 Prompt 分别传递给 Flux 模型。所以 `Apply IPAdapter Flux Model` 的输出节点不是 Conditioning，而是 `model`。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-workflow.jpeg"
+    alt="Flux IPA"
+  />
+</Frame>
+
+另外，除了上述的工作流外，你还可以尝试简单的版本，简单的版本，我测试下来，感觉生成的效果更好。我主要是使用 [Flux ComfyUI 工作流](../basics/flux-comfyui-workflow) 中推荐的完整版 Flux 工作流，然后基于这个工作流进行修改。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-simple-workflow.png"
+    alt="Flux IPA Simple"
+  />
+</Frame>
+
+
+
+

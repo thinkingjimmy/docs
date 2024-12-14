@@ -40,7 +40,13 @@ Midjourneyを使用したことがある方は、そのVariation機能をご存�
 
 ### 2.1 単一画像の変化
 
-モデルをダウンロードしたら、Flux Redux ComfyUI ワークフローを構築します。まず、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow) で完全な Flux ワークフローをロードし、それをベースにして修正します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+モデルをダウンロードしたら、Flux Redux ComfyUI ワークフローを構築します。
+
+もし手動で接続したくない場合は、Comflowy からこのワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートすることができます。（Comflowy テンプレートのダウンロード方法がわからない場合は、この[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)を参照してください。）
+
+<Card title="Flux ComfyUI Workflow Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/1e137ea1-e390-43a9-b90c-e7ab14a438b8" horizontal>
+  右上の Remix ボタンをクリックして ComfyUI ワークフローモードに入ります。
+</Card>
 
 最も大きな変更点は、追加の Flux Redux ノードグループがあることです。このノードグループは画像を Conditioning に変換し、それを Flux モデルに入力します。
 
@@ -81,6 +87,12 @@ Midjourneyを使用したことがある方は、そのVariation機能をご存�
     alt="Flux Redux Batch Image"
   />
 </Frame>
+
+もし手動で接続したくない場合は、Comflowy からこのワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートすることができます。（Comflowy テンプレートのダウンロード方法がわからない場合は、この[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)を参照してください。）
+
+<Card title="Flux ComfyUI Workflow Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/1eb99601-7d43-420f-8fbe-52e5be3e28c9" horizontal>
+  右上の Remix ボタンをクリックして ComfyUI ワークフローモードに入ります。
+</Card>
 
 ## 3. Flux Redux の重みを減らす
 

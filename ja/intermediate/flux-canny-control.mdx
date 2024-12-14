@@ -45,7 +45,13 @@ Flux Cannyモデルには2種類あります。1つはFluxのFlux Canny LoRAの�
 
 ## 2. Flux Canny LoRAワークフロー
 
-モデルをダウンロードしたら、Flux Canny ComfyUI ワークフローを構築します。まず、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow) で完全な Flux ワークフローをロードし、それをベースにして修正します。または、[Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) からこのワークフローをダウンロードしてインポートします。
+モデルをダウンロードした後、Flux Canny の ComfyUI ワークフローを構築します。まず、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow)の完全なワークフローをロードし、それをベースにこのワークフローを変更します。
+
+もし手動で接続したくない場合は、Comflowy からこのワークフローテンプレートをダウンロードし、ローカルの ComfyUI にインポートすることができます。（Comflowy テンプレートのダウンロード方法がわからない場合は、この[チュートリアル](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template)を参照してください。）
+
+<Card title="Flux ComfyUI Workflow Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/5a740d62-46cc-488a-9498-e79886388f69" horizontal>
+  右上の Remix ボタンをクリックして ComfyUI ワークフローモードに入ります。
+</Card>
 
 最も大きな変更点は、追加の Flux Canny ノードグループがあることです。このノードグループは画像を Conditioning に変換し、それを Flux モデルに入力します：
 

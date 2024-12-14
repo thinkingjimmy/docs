@@ -47,7 +47,13 @@ There are two types of Flux Canny models, one is Flux's official implementation 
 
 ## 2. Flux Canny LoRA Workflow
 
-Download the model, and then we will build the Flux Canny ComfyUI workflow. First, you can load the complete Flux workflow in [Flux ComfyUI Workflow](../basics/flux-comfyui-workflow), and then modify it based on this workflow. Alternatively, go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) to download this workflow and import it.
+Download the model, and then we will build the Flux Canny ComfyUI workflow. First, you can load the complete Flux workflow in [Flux ComfyUI Workflow](../basics/flux-comfyui-workflow), and then modify it based on this workflow. 
+
+If you don't want to manually connect, you can download this workflow template from Comflowy and import it into your local ComfyUI. (If you don't know how to download Comflowy templates, you can refer to this [tutorial](https://intercom.help/comflowy/en/articles/10229083-how-do-i-get-the-workflow-template).)
+
+<Card title="Flux ComfyUI Workflow Template" icon="cloud-arrow-down" href="https://app.comflowy.com/app/5a740d62-46cc-488a-9498-e79886388f69" horizontal>
+  Click the Remix button in the upper right corner to enter the ComfyUI workflow mode.
+</Card>
 
 The most significant change is that there is an additional Flux Canny node group. This node group converts the image to Conditioning, and then inputs it together with the Prompt to the Flux model:
 

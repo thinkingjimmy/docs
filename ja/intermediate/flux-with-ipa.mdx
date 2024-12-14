@@ -1,7 +1,65 @@
 ---
-title: Flux IPA (書き込み中)
-description: ''
+title: Flux IPA
+description: 'Flux モデルと IPAdapter モデルを使用して、元の画像の人物の位置と一致する画像を生成する方法を紹介します。'
 icon: 'image'
+"og:image": 'https://image.app-image.com/flux101/flux-ipa-header-image.png'
+"twitter:image": 'https://image.app-image.com/flux101/flux-ipa-header-image.png'
 ---
 
-書き込み中...
+<Frame caption="この画像は AI によって生成されました">
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-header-image.png"
+    alt="Flux IPA Header Image"
+  />
+</Frame>
+
+前の章では Flux Redux モデルを紹介しました。これは、入力画像と似た画像を生成することができます。ただし、入力画像の重みが高すぎるため、Prompt で微調整することができません。Redux モデルの重みを調整するためのプラグインがありますが、その効果は時々理想的ではありません。
+
+本章节では、Flux IPA モデルを使用して、入力画像と似た画像を生成する方法を紹介します。Flux IPA モデルは、Redux と同様に、入力画像と似た画像を生成できます。ただし、Redux とは異なり、Prompt を使用して入力画像を微調整することができます。下の画像のように、モナリサの画像をアップロードし、Flux IPA モデルがモナリサの画像に基づいて、モナリサの画像に似た画像を生成します。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-compare.png"
+    alt="Flux IPA"
+  />
+</Frame>
+
+## 1. Flux IPA プラグインのインストール
+
+市場には、Xlab の Flux IPA と InstantX の Flux IPA の2種類があります。私は、InstantX の Flux IPA をおすすめします。なぜなら、私のテストでは、メモリの使用量が少なく、生成結果も良好だったからです。
+
+InstantX の Flux IPA モデルを使用する場合は、[Flux IPA プラグイン](https://github.com/Shakker-Labs/ComfyUI-IPAdapter-Flux) をインストールする必要があります。ComfyUI の ComfyUI-Manager を使用してこのプラグインをインストールできます。詳細なインストール方法については、[ComfyUI プラグインのインストール](https://comflowy.com/advanced/how-to-install-comfyui-extension) を参照してください。
+
+## 2. Flux IPA モデルのダウンロード
+
+プラグインをインストールしたら、Flux IPA モデルをダウンロードする必要があります。[ここ](https://huggingface.co/InstantX/FLUX.1-dev-IP-Adapter/tree/main) から Flux IPA モデルをダウンロードし、`/models/ipadapter-flux` ディレクトリに配置します。
+
+## 3. Flux IPA ワークフロー
+
+モデルをダウンロードしたら、下図に示すように、Flux IPA ワークフローを構築できます。
+
+このワークフローを見ると、実際には基礎的な Flux ワークフローに `Apply IPAdapter Flux Model` ノード（図中①）が追加されています。そして、① を続けて接続し、図中の ②、③、④ ノードを `Apply IPAdapter Flux Model` ノードに接続します。IPAdapter モデルは Redux と異なり、データと Prompt を Flux モデルに渡す前に、それらを分けて渡します。そのため、`Apply IPAdapter Flux Model` の出力ノードは Conditioning ではなく `model` です。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-workflow.jpeg"
+    alt="Flux IPA"
+  />
+</Frame>
+
+また、上記のワークフロー以外にも、シンプルなバージョンを試してみることもできます。シンプルなバージョンでは、生成結果がより良いようです。私は、[Flux ComfyUI ワークフロー](../basics/flux-comfyui-workflow) で推奨されている完全版 Flux ワークフローを使用し、それをベースにしてワークフローを変更しました。
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-ipa/flux-ipa-simple-workflow.png"
+    alt="Flux IPA Simple"
+  />
+</Frame>
+
+
+
+
