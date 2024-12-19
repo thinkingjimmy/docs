@@ -101,3 +101,17 @@ Inpainting のワークフローを調整して、Outpainting のワークフロ
 </Frame>
 
 私のテストでは、Flux Fill は画像修正の場合よりも画像拡大の場合の方が優れているようです。そのため、満足のいく画像を得るためには、複数回生成する必要があるかもしれません。
+
+## 4. Flux Fill APIワークフロー
+
+コンピューターの性能が十分でなく、Flux Fill モデルを実行できない場合は、ComfyUI で Comflowy の [Fill API ノード](https://github.com/6174/comflowy-nodes)を使用してみることができます。もちろん、[Comflowy](https://app.comflowy.com) で直接 Flux Fill API ノードを使用することもでき、リンク方法は非常に簡単で、1つのノードを使用するだけです（ただし、APIノードはマスクデータを受信できないため、マスクを画像に変換する必要があります）。同時に、Flux ProバージョンとDevバージョンもサポートしています。
+
+<Note>注意：このノードはAPIを使用するため、使用時に相応の料金がかかります。</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-fill-api-workflow.png"
+    alt="Flux Fill API"
+  />
+</Frame>

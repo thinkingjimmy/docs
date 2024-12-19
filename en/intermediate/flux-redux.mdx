@@ -94,7 +94,21 @@ If you don't want to manually connect, you can download this workflow template f
   Click the Remix button in the upper right corner to enter the ComfyUI workflow mode.
 </Card>
 
-## 3. Reduce Flux Redux Weight
+## 3. Flux Redux API Workflow
+
+If your computer performance is not sufficient to run the Flux Redux model, you can also try using Comflowy's [Redux API node](https://github.com/6174/comflowy-nodes) in ComfyUI. Of course, you can also directly use the Flux Redux API node in [Comflowy](https://app.comflowy.com), with a simple connection method that requires just one node, and it also supports Flux Pro and Dev versions.
+
+<Note>Note that since this node uses an API, you will need to pay the corresponding fees when using it.</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-api-workflow.png"
+    alt="Flux Redux API"
+  />
+</Frame>
+
+## 4. Reduce Flux Redux Weight
 
 When using the above workflow, you may find that the weight of the Prompt is extremely low, and you basically cannot change the content or style of the image through the Prompt. What is the reason?
 
@@ -109,7 +123,7 @@ So if you want to control the content or style of the image more through the Pro
 
 Both methods have their own advantages and disadvantages, and the effect is often dependent on your input image, so you can try both according to your needs.
 
-### 3.1 Reduce Redux Weight via Extension
+### 4.1 Reduce Redux Weight via Extension
 
 First, let's talk about the first method. To solve this problem, an open-source developer has developed this [extension](https://github.com/kaibioinfo/ComfyUI_AdvancedRefluxControl), allowing you to better control the Redux model.
 
@@ -143,7 +157,7 @@ This plugin has not only this usage method, but also can be used through Mask to
   />
 </Frame>
 
-### 3.2 Increase Text Prompt Weight
+### 4.2 Increase Text Prompt Weight
 
 Next, let's talk about the second method, increasing the weight of Text, or increasing the length of your Text Prompt. The workflow is as follows:
 

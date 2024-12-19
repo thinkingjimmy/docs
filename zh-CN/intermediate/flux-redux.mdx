@@ -94,7 +94,21 @@ icon: 'clone'
   点击右上角 Remix 按钮，进入 ComfyUI 工作流模式。
 </Card>
 
-## 3. 降低 Flux Redux 权重
+## 3. Flux Redux API 工作流
+
+如果你的电脑性能不够，无法跑动 Flux Redux 模型，也可以试试在 ComfyUI 里使用 Comflowy 的 [Redux API 节点](https://github.com/6174/comflowy-nodes)。当然，你也可以直接在 [Comflowy](https://app.comflowy.com) 里使用 Flux Redux API 节点，链接方式很简单，只需要用一个节点就能使用，同时还支持 Flux Pro 版本和 Dev 版本.
+
+<Note>注意，因为此节点使用的是 API，所以使用的时候需要支付相应的费用。</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-api-workflow.png"
+    alt="Flux Redux API"
+  />
+</Frame>
+
+## 4. 降低 Flux Redux 权重
 
 在使用上面的工作流的时候，你可能会发现，Prompt 的权重极低，你基本上无法通过 Prompt 去更改图片的内容，亦或者是风格。这是什么原因？
 
@@ -109,7 +123,7 @@ icon: 'clone'
 
 这两种方法各有优缺点，效果好坏很多时候取决于你的输入图，所以各位可以根据自己的需求都尝试下。
 
-### 3.1 通过插件降低 Redux 权重
+### 4.1 通过插件降低 Redux 权重
 
 首先，先说第一种方法。为了解决这个问题，有开源开发者开发了这个[插件](https://github.com/kaibioinfo/ComfyUI_AdvancedRefluxControl)，允许你更好地对 Redux 模型进行控制。
 
@@ -143,7 +157,7 @@ icon: 'clone'
   />
 </Frame>
 
-### 3.2 增加 Text Prompt 权重
+### 4.2 增加 Text Prompt 权重
 
 再说下第二种方法，增加 Text 的权重，或者说增加 Text Prompt 的长度。工作流如下：
 

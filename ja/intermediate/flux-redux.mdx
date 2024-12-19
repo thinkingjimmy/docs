@@ -94,7 +94,21 @@ Midjourneyを使用したことがある方は、そのVariation機能をご存�
   右上の Remix ボタンをクリックして ComfyUI ワークフローモードに入ります。
 </Card>
 
-## 3. Flux Redux の重みを減らす
+## 3. Flux Redux API ワークフロー
+
+もしコンピューターの性能が十分でなく、Flux Redux モデルを実行できない場合は、ComfyUI で Comflowy の [Redux API ノード](https://github.com/6174/comflowy-nodes) を使用してみることもできます。もちろん、[Comflowy](https://app.comflowy.com) で直接 Flux Redux API ノードを使用することもでき、リンク方法は非常に簡単で、1つのノードを使用するだけです。また、Flux Pro バージョンと Dev バージョンもサポートしています。
+
+<Note>このノードはAPIを使用するため、使用時に相応の料金がかかります。</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-redux/flux-redux-api-workflow.png"
+    alt="Flux Redux API"
+  />
+</Frame>
+
+## 4. Flux Redux の重みを減らす
 
 上記のワークフローを使用すると、Prompt の重みが非常に低く、Prompt を介して画像の内容やスタイルを変更することができないことがあります。その理由は何でしょうか？
 
@@ -109,7 +123,7 @@ Midjourneyを使用したことがある方は、そのVariation機能をご存�
 
 どちらの方法もそれぞれの利点と欠点があり、結果は通常入力画像に依存するため、必要に応じて両方を試してみることができます。
 
-### 3.1 プラグインを使用して Redux の重みを減らす
+### 4.1 プラグインを使用して Redux の重みを減らす
 
 まず、1 つ目の方法について説明します。この問題を解決するために、オープンソースの開発者がこの [プラグイン](https://github.com/kaibioinfo/ComfyUI_AdvancedRefluxControl) を開発しました。このプラグインを使用すると、Redux モデルをより制御することができます。
 
@@ -143,7 +157,7 @@ Midjourneyを使用したことがある方は、そのVariation機能をご存�
   />
 </Frame>
 
-### 3.2 Text Prompt の重みを増加させる
+### 4.2 Text Prompt の重みを増加させる
 
 次に、2 つ目の方法について説明します。Text の重みを増加させる、または Prompt の長さを増加させることで、Prompt の重みを増加させることができます。ワークフローは以下の通りです：
 

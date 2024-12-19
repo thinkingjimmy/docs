@@ -101,3 +101,17 @@ First, you need to add a Pad Image for Outpainting node (①), then connect it t
 </Frame>
 
 After my testing, I personally feel that Flux Fill is not as good as inpainting in the outpainting scenario. So you may need to generate it a few times to get a satisfactory image.
+
+## 4. Flux Fill API Workflow
+
+If your computer performance is not sufficient to run the Flux Fill model, you can also try using Comflowy's [Fill API node](https://github.com/6174/comflowy-nodes) in ComfyUI. Of course, you can also directly use the Flux Fill API node in [Comflowy](https://app.comflowy.com), with a simple connection method that requires just one node, and it also supports Flux Pro and Dev versions.
+
+<Note>Note that since this node uses an API, you will need to pay the corresponding fees when using it.</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/basics/flux-inpainting-and-outpainting/flux-fill-api-workflow.png"
+    alt="Flux Fill API"
+  />
+</Frame>

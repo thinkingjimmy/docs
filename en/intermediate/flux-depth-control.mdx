@@ -43,7 +43,7 @@ You can all download them and try them out:
 
 If you download the version that combines the LoRA and Dev model, then you only need to modify the workflow based on the [Flux Edge Control](./flux-canny-control) in the previous chapter. Or go to [Comflowy](https://app.comflowy.com/app/s-flux-dev-gguf-workflow-db9bd4) to download this workflow and import it for use.
 
-The method is very simple, you just need to replace the `flux Canny` in the ① Diffusion node group with the Depth model, and then replace the `Canny` node with any `Depth` node (you can use any Depth node you are familiar with) (图中②). Finally, connect the `Depth` node and the `Load Image` node. If you want to preview the effect of the Depth node, you can connect the `Depth` node and the `Preview Image` node, so you can see the depth map output by the Depth node.
+The method is very simple, you just need to replace the `flux Canny` in the ① Diffusion node group with the Depth model, and then replace the `Canny` node with any `Depth` node (you can use any Depth node you are familiar with) (Figure ②). Finally, connect the `Depth` node and the `Load Image` node. If you want to preview the effect of the Depth node, you can connect the `Depth` node and the `Preview Image` node, so you can see the depth map output by the Depth node.
 
 <Frame>
   <img
@@ -143,6 +143,20 @@ The modification is not too difficult:
   <img
     className="rounded-xl"
     src="/images/intermediate/flux-depth-control/flux-depth-control-xlabs-workflow.jpeg"
+    alt="Flux Depth Control"
+  />
+</Frame>
+
+## 4. Flux Depth API Workflow
+
+If your computer performance is not sufficient to run the Flux Depth model, you can also try using Comflowy's [Depth API node](https://github.com/6174/comflowy-nodes) in ComfyUI. Of course, you can also directly use the Flux Depth API node in [Comflowy](https://app.comflowy.com), with a simple connection method that requires just one node, and it also supports Flux Pro and Dev versions.
+
+<Note>Note that since this node uses an API, you will need to pay the corresponding fees when using it.</Note>
+
+<Frame>
+  <img
+    className="rounded-xl"
+    src="/images/intermediate/flux-depth-control/flux-depth-control-api-workflow.png"
     alt="Flux Depth Control"
   />
 </Frame>
