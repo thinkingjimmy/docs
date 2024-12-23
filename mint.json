@@ -304,5 +304,10 @@
     "twitter:image": "https://image.app-image.com/flux101/hero-light.png",
     "twitter:creator": "@hellojimmywong",
     "twitter:description": "Flux 101 is a comprehensive guide to using Flux, a cutting-edge image generation model. It covers everything from basic usage to advanced techniques, and includes a detailed explanation of how to use Flux with ComfyUI."
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-4PBSC7Y97F"
+    }
   }
 }
