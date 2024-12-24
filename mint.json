@@ -59,15 +59,33 @@
       "version": "English"
     },
     {
+      "name": "Author's YouTube",
+      "icon": "youtube",
+      "url": "https://www.youtube.com/@HeyJimmyWong",
+      "version": "English"
+    },
+    {
       "name": "作者の Twitter",
       "icon": "x-twitter",
       "url": "https://twitter.com/hellojimmywong",
       "version": "日本語"
     },
     {
-      "name": "作者的 Twitter",
-      "icon": "x-twitter",
-      "url": "https://twitter.com/hellojimmywong",
+      "name": "作者の YouTube",
+      "icon": "youtube",
+      "url": "https://www.youtube.com/@HeyJimmyWong",
+      "version": "日本語"
+    },
+    {
+      "name": "作者的小红书",
+      "icon": "book",
+      "url": "https://www.xiaohongshu.com/user/profile/6073d38d00000000010068a6",
+      "version": "简体中文"
+    },
+    {
+      "name": "作者的 B 站",
+      "icon": "youtube",
+      "url": "https://space.bilibili.com/1409205119",
       "version": "简体中文"
     },
     {
@@ -273,6 +291,10 @@
           {
             "label": "ComfyUI 101",
             "url": "https://www.comflowy.com/docs"
+          },
+          {
+            "label": "Diffusion 101",
+            "url": "https://www.diffusion101.com"
           }
         ]
       },
